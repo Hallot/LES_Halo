@@ -45,7 +45,6 @@ src/Fortran/timdata.o
 src/Fortran/vel2.o
 src/Fortran/velFG.o
 src/Fortran/winddata.dat
-src/OpenCL/KernelStubs/
 src/OpenCL/Wrappers/module_LES_combined_ocl.o
 src/OpenCL/module_LES_combined_ocl_TEMPL_V2_PostCPP.f95
 src/OpenCL/module_LES_conversions.o
