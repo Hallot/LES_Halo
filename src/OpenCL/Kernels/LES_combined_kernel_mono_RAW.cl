@@ -274,7 +274,19 @@ __kernel void LES_combined_kernel (
   const float dt,
   const unsigned int im,
   const unsigned int jm,
-  const unsigned int km
+  const unsigned int km,
+                __global float3* tl_in,
+                __global float3* t_in,
+                __global float3* tr_in,
+                __global float3* r_in,
+                __global float3* br_in,
+                __global float3* b_in,
+                __global float3* bl_in,
+                __global float3* l_in,
+                __global float3* t_out,
+                __global float3* r_out,
+                __global float3* b_out,
+                __global float3* l_out
         ) {
  unsigned int gl_id = get_global_id(0);
  unsigned int gr_id = get_group_id(0);

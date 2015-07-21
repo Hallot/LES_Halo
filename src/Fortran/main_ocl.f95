@@ -220,8 +220,8 @@
             wind_profile, &
 #endif
             dt, im, jm, km &
-            !, tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, &
-            !t_out, r_out, b_out, l_out &
+            , tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, &
+            t_out, r_out, b_out, l_out &
               )
 #endif
 

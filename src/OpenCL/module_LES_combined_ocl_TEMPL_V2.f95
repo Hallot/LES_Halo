@@ -27,8 +27,8 @@ contains
         wind_profile, &
 #endif
         dt, im, jm, km &
-        !, tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, &
-        !t_out, r_out, b_out, l_out &
+        , tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, &
+        t_out, r_out, b_out, l_out &
         )
         use params_common_sn
 
@@ -92,7 +92,8 @@ contains
         integer, intent(In) :: km
 !        integer, intent(In) :: nmax
 
-        !real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out
+        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut)  :: tl_in
+        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut)  :: t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out
 
         ! -----------------------------------------------------------------------
         ! Combined arrays for OpenCL kernels
@@ -133,6 +134,7 @@ contains
 
         chunks_num=0.0
         chunks_denom=0.0
+        tl_in=1.0
 
         !$ACC Kernel(LES_combined_kernel_mono), GlobalRange(1), LocalRange(1)
         call LES_combined(p_scratch, uvw, uvwsum, fgh, fgh_old, &
@@ -145,7 +147,7 @@ contains
 #endif
             cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,&
             val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km &
-            !, tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out &
+            , tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out &
             )
         !$ACC End Kernel
 
@@ -163,7 +165,7 @@ contains
 #ifdef EXTERNAL_WIND_PROFILE
         oclBuffers(11) = wind_profile_buf ! BONDV1
 #endif
-        !oclBuffers(12) = tl_in_buf ! Halo
+        oclBuffers(12) = tl_in_buf ! Halo
         oclNunits = initialise_LES_kernel_nunits
         oclNthreadsHint = initialise_LES_kernel_nthreads
 
@@ -300,6 +302,7 @@ contains
 
         integer, dimension(3) :: lb = (/0,0,0/)
         integer, dimension(3) :: ub = (/ip,jp,kp/)
+        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: tl_in2
 
         foldo=0
         goldo=0
@@ -317,6 +320,7 @@ contains
 #ifdef EXTERNAL_WIND_PROFILE
         wind_profile_buf = oclBuffers(11)  ! BONDV1
 #endif
+        tl_in_buf = oclBuffers(12) ! Halo
 
         p_sz = shape(po)
         uvw_sz = shape(uvw)
@@ -337,7 +341,9 @@ contains
          print *, 'run_LES_kernel: time step = ',n
 #endif
 
-        !call compare_halos(tl_in, tl_in, lb, ub)
+        call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in2)
+        print *, 'run_LES_kernel: time step = ', tl_in2
+        call compare_halos(tl_in, tl_in2, lb, ub)
 
 
         ! ========================================================================================================================================================

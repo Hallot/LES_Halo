@@ -19,7 +19,7 @@ contains
 
 
 
-    subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         )
+    subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         , tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in,         t_out, r_out, b_out, l_out         )
         use oclWrapper
         use params_common_sn
         implicit none
@@ -71,7 +71,8 @@ contains
         integer, intent(In) :: jm
         integer, intent(In) :: km
 ! integer, intent(In) :: nmax
-        !real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut) :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out
+        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut) :: tl_in
+        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut) :: t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out
         ! -----------------------------------------------------------------------
         ! Combined arrays for OpenCL kernels
         real(kind=4), dimension(0:3,0:ip+1,-1:jp+1,-1:kp+1) :: uvw
@@ -116,6 +117,18 @@ contains
         integer(8) :: dy1_buf
         integer(8) :: dzn_buf
         integer(8) :: z2_buf
+        integer(8) :: tl_in_buf
+        integer(8) :: t_in_buf
+        integer(8) :: tr_in_buf
+        integer(8) :: r_in_buf
+        integer(8) :: br_in_buf
+        integer(8) :: b_in_buf
+        integer(8) :: bl_in_buf
+        integer(8) :: l_in_buf
+        integer(8) :: t_out_buf
+        integer(8) :: r_out_buf
+        integer(8) :: b_out_buf
+        integer(8) :: l_out_buf
         integer(8) :: uvw_buf
         integer(8) :: uvwsum_buf
         integer(8) :: fgh_buf
@@ -145,6 +158,18 @@ contains
         integer, dimension(1):: dy1_sz
         integer, dimension(1):: dzn_sz
         integer, dimension(1):: z2_sz
+        integer, dimension(3):: tl_in_sz
+        integer, dimension(3):: t_in_sz
+        integer, dimension(3):: tr_in_sz
+        integer, dimension(3):: r_in_sz
+        integer, dimension(3):: br_in_sz
+        integer, dimension(3):: b_in_sz
+        integer, dimension(3):: bl_in_sz
+        integer, dimension(3):: l_in_sz
+        integer, dimension(3):: t_out_sz
+        integer, dimension(3):: r_out_sz
+        integer, dimension(3):: b_out_sz
+        integer, dimension(3):: l_out_sz
         integer, dimension(4):: uvw_sz
         integer, dimension(4):: uvwsum_sz
         integer, dimension(4):: fgh_sz
@@ -173,6 +198,7 @@ contains
         p_scratch(1,:,:,:) = p(:,:,:)
         chunks_num=0.0
         chunks_denom=0.0
+        tl_in=1.0
         
         if ( init_ocl_local /= 1 ) then 
           init_initialise_LES_kernel_local = 1
@@ -204,6 +230,18 @@ contains
         dy1_sz = shape(dy1)
         dzn_sz = shape(dzn)
         z2_sz = shape(z2)
+        tl_in_sz = shape(tl_in)
+        t_in_sz = shape(t_in)
+        tr_in_sz = shape(tr_in)
+        r_in_sz = shape(r_in)
+        br_in_sz = shape(br_in)
+        b_in_sz = shape(b_in)
+        bl_in_sz = shape(bl_in)
+        l_in_sz = shape(l_in)
+        t_out_sz = shape(t_out)
+        r_out_sz = shape(r_out)
+        b_out_sz = shape(b_out)
+        l_out_sz = shape(l_out)
         uvw_sz = shape(uvw)
         uvwsum_sz = shape(uvwsum)
         fgh_sz = shape(fgh)
@@ -233,14 +271,26 @@ contains
         call oclMake1DFloatArrayReadBuffer(dx1_buf,dx1_sz ,dx1)
         call oclMake1DFloatArrayReadBuffer(dy1_buf,dy1_sz ,dy1)
         call oclMake1DFloatArrayReadBuffer(dzn_buf,dzn_sz ,dzn)
-        call oclMake1DFloatArrayReadWriteBuffer(z2_buf,z2_sz ,z2)
+        call oclMake1DFloatArrayReadBuffer(z2_buf,z2_sz ,z2)
+        call oclMake3DFloatArrayReadWriteBuffer(tl_in_buf,tl_in_sz ,tl_in)
+        call oclMake3DFloatArrayReadWriteBuffer(t_in_buf,t_in_sz ,t_in)
+        call oclMake3DFloatArrayReadWriteBuffer(tr_in_buf,tr_in_sz ,tr_in)
+        call oclMake3DFloatArrayReadWriteBuffer(r_in_buf,r_in_sz ,r_in)
+        call oclMake3DFloatArrayReadWriteBuffer(br_in_buf,br_in_sz ,br_in)
+        call oclMake3DFloatArrayReadWriteBuffer(b_in_buf,b_in_sz ,b_in)
+        call oclMake3DFloatArrayReadWriteBuffer(bl_in_buf,bl_in_sz ,bl_in)
+        call oclMake3DFloatArrayReadWriteBuffer(l_in_buf,l_in_sz ,l_in)
+        call oclMake3DFloatArrayReadWriteBuffer(t_out_buf,t_out_sz ,t_out)
+        call oclMake3DFloatArrayReadWriteBuffer(r_out_buf,r_out_sz ,r_out)
+        call oclMake3DFloatArrayReadWriteBuffer(b_out_buf,b_out_sz ,b_out)
+        call oclMake3DFloatArrayReadWriteBuffer(l_out_buf,l_out_sz ,l_out)
         call oclMake4DFloatArrayReadWriteBuffer(uvw_buf,uvw_sz ,uvw)
         call oclMake4DFloatArrayReadWriteBuffer(uvwsum_buf,uvwsum_sz ,uvwsum)
         call oclMake4DFloatArrayReadWriteBuffer(fgh_buf,fgh_sz ,fgh)
         call oclMake4DFloatArrayReadWriteBuffer(fgh_old_buf,fgh_old_sz ,fgh_old)
         call oclMake4DFloatArrayReadWriteBuffer(diu_buf,diu_sz ,diu)
         call oclMake4DFloatArrayReadWriteBuffer(mask1_buf,mask1_sz ,mask1)
-        call oclMake4DFloatArrayReadWriteBuffer(p_scratch_buf,p_scratch_sz ,p_scratch)
+        call oclMake4DFloatArrayReadBuffer(p_scratch_buf,p_scratch_sz ,p_scratch)
         call oclMake1DFloatArrayReadWriteBuffer(chunks_num_buf,chunks_num_sz ,chunks_num)
         call oclMake1DFloatArrayReadWriteBuffer(chunks_denom_buf,chunks_denom_sz ,chunks_denom)
         call oclMake1DFloatArrayReadWriteBuffer(val_ptr_buf,val_ptr_sz ,val_ptr)
@@ -276,6 +326,18 @@ contains
         call oclSetFloatArrayArg(25, chunks_denom_buf )
         call oclSetIntArrayArg(26, n_ptr_buf )
         call oclSetIntArrayArg(27, state_ptr_buf )
+        call oclSetFloatArrayArg(32, tl_in_buf )
+        call oclSetFloatArrayArg(33, t_in_buf )
+        call oclSetFloatArrayArg(34, tr_in_buf )
+        call oclSetFloatArrayArg(35, r_in_buf )
+        call oclSetFloatArrayArg(36, br_in_buf )
+        call oclSetFloatArrayArg(37, b_in_buf )
+        call oclSetFloatArrayArg(38, bl_in_buf )
+        call oclSetFloatArrayArg(39, l_in_buf )
+        call oclSetFloatArrayArg(40, t_out_buf )
+        call oclSetFloatArrayArg(41, r_out_buf )
+        call oclSetFloatArrayArg(42, b_out_buf )
+        call oclSetFloatArrayArg(43, l_out_buf )
         call oclSetFloatConstArg(28, dt )
         call oclSetIntConstArg(29, im )
         call oclSetIntConstArg(30, jm )
@@ -306,6 +368,18 @@ contains
         call oclWrite1DFloatArrayBuffer(dy1_buf,dy1_sz,dy1)
         call oclWrite1DFloatArrayBuffer(dzn_buf,dzn_sz,dzn)
         call oclWrite1DFloatArrayBuffer(z2_buf,z2_sz,z2)
+        call oclWrite3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in)
+        call oclWrite3DFloatArrayBuffer(t_in_buf,t_in_sz,t_in)
+        call oclWrite3DFloatArrayBuffer(tr_in_buf,tr_in_sz,tr_in)
+        call oclWrite3DFloatArrayBuffer(r_in_buf,r_in_sz,r_in)
+        call oclWrite3DFloatArrayBuffer(br_in_buf,br_in_sz,br_in)
+        call oclWrite3DFloatArrayBuffer(b_in_buf,b_in_sz,b_in)
+        call oclWrite3DFloatArrayBuffer(bl_in_buf,bl_in_sz,bl_in)
+        call oclWrite3DFloatArrayBuffer(l_in_buf,l_in_sz,l_in)
+        call oclWrite3DFloatArrayBuffer(t_out_buf,t_out_sz,t_out)
+        call oclWrite3DFloatArrayBuffer(r_out_buf,r_out_sz,r_out)
+        call oclWrite3DFloatArrayBuffer(b_out_buf,b_out_sz,b_out)
+        call oclWrite3DFloatArrayBuffer(l_out_buf,l_out_sz,l_out)
         call oclWrite4DFloatArrayBuffer(uvw_buf,uvw_sz,uvw)
         call oclWrite4DFloatArrayBuffer(uvwsum_buf,uvwsum_sz,uvwsum)
         call oclWrite4DFloatArrayBuffer(fgh_buf,fgh_sz,fgh)
@@ -319,18 +393,28 @@ contains
         call oclWrite1DIntArrayBuffer(n_ptr_buf,n_ptr_sz,n_ptr)
         call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz,state_ptr)
         
-        ! call LES_combined(p_scratch, uvw, uvwsum, fgh, fgh_old,             rhs, mask1, diu, sm,            dxs, dys, dzs, dx1, dy1, dzn,             z2,             cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,            val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km             )
+        ! call LES_combined(p_scratch, uvw, uvwsum, fgh, fgh_old,             rhs, mask1, diu, sm,            dxs, dys, dzs, dx1, dy1, dzn,             z2,             cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,            val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km             , tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out             )
         call runOcl(initialise_LES_kernel_globalrange,initialise_LES_kernel_localrange,initialise_LES_kernel_exectime)
         
         ! Read back Read and ReadWrite arrays
-        call oclRead1DFloatArrayBuffer(z2_buf,z2_sz,z2)
+        call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in)
+        call oclRead3DFloatArrayBuffer(t_in_buf,t_in_sz,t_in)
+        call oclRead3DFloatArrayBuffer(tr_in_buf,tr_in_sz,tr_in)
+        call oclRead3DFloatArrayBuffer(r_in_buf,r_in_sz,r_in)
+        call oclRead3DFloatArrayBuffer(br_in_buf,br_in_sz,br_in)
+        call oclRead3DFloatArrayBuffer(b_in_buf,b_in_sz,b_in)
+        call oclRead3DFloatArrayBuffer(bl_in_buf,bl_in_sz,bl_in)
+        call oclRead3DFloatArrayBuffer(l_in_buf,l_in_sz,l_in)
+        call oclRead3DFloatArrayBuffer(t_out_buf,t_out_sz,t_out)
+        call oclRead3DFloatArrayBuffer(r_out_buf,r_out_sz,r_out)
+        call oclRead3DFloatArrayBuffer(b_out_buf,b_out_sz,b_out)
+        call oclRead3DFloatArrayBuffer(l_out_buf,l_out_sz,l_out)
         call oclRead4DFloatArrayBuffer(uvw_buf,uvw_sz,uvw)
         call oclRead4DFloatArrayBuffer(uvwsum_buf,uvwsum_sz,uvwsum)
         call oclRead4DFloatArrayBuffer(fgh_buf,fgh_sz,fgh)
         call oclRead4DFloatArrayBuffer(fgh_old_buf,fgh_old_sz,fgh_old)
         call oclRead4DFloatArrayBuffer(diu_buf,diu_sz,diu)
         call oclRead4DFloatArrayBuffer(mask1_buf,mask1_sz,mask1)
-        call oclRead4DFloatArrayBuffer(p_scratch_buf,p_scratch_sz,p_scratch)
         call oclRead1DFloatArrayBuffer(chunks_num_buf,chunks_num_sz,chunks_num)
         call oclRead1DFloatArrayBuffer(chunks_denom_buf,chunks_denom_sz,chunks_denom)
         call oclRead1DFloatArrayBuffer(val_ptr_buf,val_ptr_sz,val_ptr)
@@ -348,7 +432,7 @@ contains
         oclBuffers(8) = chunks_denom_buf ! RHSAV, PAV
         oclBuffers(9) = n_ptr_buf ! BONDV1, SOR
         oclBuffers(10) = state_ptr_buf ! ALL
-        !oclBuffers(12) = tl_in_buf ! Halo
+        oclBuffers(12) = tl_in_buf ! Halo
         oclNunits = initialise_LES_kernel_nunits
         oclNthreadsHint = initialise_LES_kernel_nthreads
     end subroutine initialise_LES_kernel
@@ -431,6 +515,7 @@ contains
         real (kind=4) :: exectime, sor_exectime, time_start, time_stop !
         integer, dimension(3) :: lb = (/0,0,0/)
         integer, dimension(3) :: ub = (/ip,jp,kp/)
+        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1) :: tl_in2
         foldo=0
         goldo=0
         holdo=0
@@ -444,6 +529,7 @@ contains
         chunks_denom_buf = oclBuffers(8) ! RHSAV, PAV
         n_ptr_buf = oclBuffers(9) ! BONDV1, SOR
         state_ptr_buf = oclBuffers(10) ! ALL
+        tl_in_buf = oclBuffers(12) ! Halo
         p_sz = shape(po)
         uvw_sz = shape(uvw)
         uvwsum_sz = shape(uvwsum)
@@ -455,7 +541,9 @@ contains
         n_ptr_sz = shape(n_ptr)
         state_ptr_sz = shape(state_ptr)
         n_ptr(1)=n
-        !call compare_halos(tl_in, tl_in, lb, ub)
+        call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in2)
+        print *, 'run_LES_kernel: time step = ', tl_in2
+        call compare_halos(tl_in, tl_in2, lb, ub)
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
         ! 2. Run the time/state nested loops, copying only time and state

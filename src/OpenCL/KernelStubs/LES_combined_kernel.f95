@@ -10,7 +10,7 @@ contains
 
         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s, &
         val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km &
-        !, tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out &
+        , tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out &
         )
 
       use common_sn
@@ -52,6 +52,6 @@ contains
         integer, intent(In) :: jm
         integer, intent(In) :: km
 
-        !real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut) :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out
+        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut) :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out
 !
 end module module_LES_combined_kernel
