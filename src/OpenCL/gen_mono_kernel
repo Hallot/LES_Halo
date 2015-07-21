@@ -1,0 +1,2 @@
+cpp -P -I/Users/wim/SoC_Research/DPRI/LEScode/RefactoredSources/../OpenCL/Kernels/ -DEXT_DEFS -DKERNEL=2 -DNTH=8 -DLOOP_ORDER=1 -Wno-extra-tokens  Kernels/LES_combined_kernel.cl > Kernels/LES_combined_kernel_mono_RAW.cl
+perl -e 'while(<>) {/^\s*$/ && next;s/LES_combined_kernel/LES_combined_kernel_mono/;print $_;}' < Kernels/LES_combined_kernel_mono_RAW.cl > Kernels/LES_combined_kernel_mono.cl
