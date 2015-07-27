@@ -609,8 +609,8 @@ contains
         call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, tr_in)
         call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, br_in)
         call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
-        call read_ext_halos_out(tl_in, tr_in, br_in, bl_in,             v_dim, h_w, h_h, h_d, c_w, c_h,             tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
-        call read_halos_out(t_in, r_in, b_in, l_in,             v_dim, h_w, h_h, h_d, c_w, c_h,             t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+        call read_ext_halos_out(tl_in, tr_in, br_in, bl_in,             v_dim, h_h, h_d, c_w,             tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+        call read_halos_out(t_in, r_in, b_in, l_in,             v_dim, h_h, h_d, c_w,             t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
         call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out,             v_dim, h_w, h_h, h_d, c_w, c_h,             t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
@@ -801,9 +801,9 @@ contains
             call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, l_in)
         end subroutine merge_halos_in
         ! Read the inner halos from the device to the host
-        subroutine read_halos_out(t_in, r_in, b_in, l_in,             v_dim, h_w, h_h, h_d, c_w, c_h,             t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+        subroutine read_halos_out(t_in, r_in, b_in, l_in,             v_dim, h_h, h_d, c_w,             t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
             use oclWrapper
-            integer, intent (in) :: v_dim, h_w, h_h, h_d, c_w, c_h
+            integer, intent (in) :: v_dim, h_h, h_d, c_w
             real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: t_in
             real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: r_in
             real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: b_in
@@ -826,9 +826,9 @@ contains
         end subroutine read_halos_out
         ! Read the exterior inner halos from the device to the host
         ! Test function for a single node
-        subroutine read_ext_halos_out(tl_in, tr_in, br_in, bl_in,             v_dim, h_w, h_h, h_d, c_w, c_h,             tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+        subroutine read_ext_halos_out(tl_in, tr_in, br_in, bl_in,             v_dim, h_h, h_d, c_w,             tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
             use oclWrapper
-            integer, intent (in) :: v_dim, h_w, h_h, h_d, c_w, c_h
+            integer, intent (in) :: v_dim, h_h, h_d, c_w
             real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: tl_in
             real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: tr_in
             real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: br_in
