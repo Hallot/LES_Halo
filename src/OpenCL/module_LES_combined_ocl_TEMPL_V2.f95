@@ -293,7 +293,11 @@ contains
         integer, dimension(4) :: tl_in_sz, t_in_sz, tr_in_sz, r_in_sz, br_in_sz, b_in_sz, bl_in_sz, l_in_sz, t_out_sz, r_out_sz, b_out_sz, l_out_sz
 
         integer :: state, nn, ii
-        real(kind=4) :: aaa, bbb, rhsav, area, pav, pco, sor
+        real(kind=4) :: rhsav, area, pav, pco, sor
+#if KERNEL == CPU_KERNEL
+        real(kind=4) :: aaa, bbb
+#endif
+        
 #ifdef VERBOSE
         real(kind=4) :: cflu, cflv, cflw
         integer :: i, j, k
@@ -318,8 +322,9 @@ contains
 
         integer, parameter :: ST_PRESS_RHSAV=7, ST_PRESS_SOR=8, ST_PRESS_PAV=9, ST_PRESS_ADJ=10, ST_PRESS_BOUNDP=11, ST_DONE=12
         
-        real (kind=4) :: exectime, sor_exectime, time_start, time_stop !
+        real (kind=4) :: exectime
 #ifdef TIMINGS
+        real (kind=4) :: sor_exectime, time_start, time_stop !
         integer :: itim
         real (kind=4), dimension(0:12) :: ktimestamp
 #endif
@@ -393,6 +398,26 @@ contains
         !tl_in2 = 10.0
         !call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in2)
         !call compare_halos(tl_in, tl_in2, lb, ub)
+        
+        tl_in = 1.0
+        t_in = 2.0
+        tr_in = 3.0
+        r_in = 4.0
+        br_in = 5.0
+        b_in = 6.0
+        bl_in = 7.0
+        l_in = 8.0
+        
+        
+        call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
+        call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, r_in)
+        call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, b_in)
+        call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, l_in)
+        call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, tl_in)
+        call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, tr_in)
+        call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, br_in)
+        call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
+        
         
         call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
             v_dim, h_w, h_h, h_d, c_w, c_h, &
