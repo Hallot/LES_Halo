@@ -879,6 +879,36 @@ contains
             call oclRead4DFloatArrayBuffer(l_in_buf, l_in_sz, l_in)
             
         end subroutine read_halos_out
+        
+        ! Read the exterior inner halos from the device to the host
+        ! Test function for a single node
+        subroutine read_halos_out(tl_in, tr_in, br_in, bl_in, &
+            v_dim, h_w, h_h, h_d, c_w, c_h, &
+            tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+            integer, intent (in) :: v_dim, h_w, h_h, h_d, c_w, c_h
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out)  :: tl_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out)  :: tr_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out)  :: br_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out)  :: bl_in
+            
+            ! OpenCL buffer declarations
+            integer(8) :: tl_in_buf
+            integer(8) :: tr_in_buf
+            integer(8) :: br_in_buf
+            integer(8) :: bl_in_buf
+            ! OpenCL buffer size declarations
+            integer, dimension(4):: tl_in_sz
+            integer, dimension(4):: tr_in_sz
+            integer, dimension(4):: br_in_sz
+            integer, dimension(4):: bl_in_sz
+            
+            ! Read halos from device
+            call oclRead4DFloatArrayBuffer(tl_in_buf, tl_in_sz, tl_in)
+            call oclRead4DFloatArrayBuffer(tr_in_buf, tr_in_sz, tr_in)
+            call oclRead4DFloatArrayBuffer(br_in_buf, br_in_sz, br_in)
+            call oclRead4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
+            
+        end subroutine read_halos_out
             
             
         ! Test functions
