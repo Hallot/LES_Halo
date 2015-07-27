@@ -27,8 +27,8 @@ contains
         wind_profile, &
 #endif
         dt, im, jm, km &
-        , tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, &
-        t_out, r_out, b_out, l_out &
+        !, tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, &
+        !t_out, r_out, b_out, l_out &
         )
         use params_common_sn
 
@@ -92,8 +92,15 @@ contains
         integer, intent(In) :: km
 !        integer, intent(In) :: nmax
 
-        real(kind=4), dimension(4, 1:ip+3, 1:jp+3, 1:kp+3), intent(InOut)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
-        real(kind=4), dimension(4, 1:ip+5, 1:jp+3, 1:kp+3), intent(InOut)  :: t_out, b_out
+        integer, parameter :: v_dim = 4
+        integer, parameter :: h_w = 1
+        integer, parameter :: h_h = 1
+        integer, parameter :: h_d = kp + 3
+        integer, parameter :: c_w = ip + 3
+        integer, parameter :: c_h = jp + 3
+        
+        real(kind=4), dimension(v_dim, c_w, c_h, h_d)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
+        real(kind=4), dimension(v_dim, c_w + 2 * h_w, c_h, h_d) :: t_out, b_out
 
         ! -----------------------------------------------------------------------
         ! Combined arrays for OpenCL kernels
@@ -259,8 +266,14 @@ contains
         integer, dimension(256) :: n_ptr
         integer, dimension(256) :: state_ptr
         
-        real(kind=4), dimension(4, 1:ip+3, 1:jp+3, 1:kp+3)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
-        real(kind=4), dimension(4, 1:ip+5, 1:jp+3, 1:kp+3) :: t_out, b_out
+        integer, parameter :: v_dim = 4
+        integer, parameter :: h_w = 1
+        integer, parameter :: h_h = 1
+        integer, parameter :: h_d = kp + 3
+        integer, parameter :: c_w = ip + 3
+        integer, parameter :: c_h = jp + 3
+        real(kind=4), dimension(v_dim, c_w, c_h, h_d)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
+        real(kind=4), dimension(v_dim, c_w + 2 * h_w, c_h, h_d) :: t_out, b_out
         
         integer(8) :: p_buf
         integer(8) :: uvw_buf
@@ -380,6 +393,18 @@ contains
         !tl_in2 = 10.0
         !call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in2)
         !call compare_halos(tl_in, tl_in2, lb, ub)
+        
+        call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+            v_dim, h_w, h_h, h_d, c_w, c_h, &
+            tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+            
+        call read_halos_out(t_in, r_in, b_in, l_in, &
+            v_dim, h_w, h_h, h_d, c_w, c_h, &
+            t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+        
+        call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+            v_dim, h_w, h_h, h_d, c_w, c_h, &
+            t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 
 
         ! ========================================================================================================================================================
@@ -882,7 +907,7 @@ contains
         
         ! Read the exterior inner halos from the device to the host
         ! Test function for a single node
-        subroutine read_halos_out(tl_in, tr_in, br_in, bl_in, &
+        subroutine read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
             v_dim, h_w, h_h, h_d, c_w, c_h, &
             tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
             integer, intent (in) :: v_dim, h_w, h_h, h_d, c_w, c_h
@@ -908,7 +933,7 @@ contains
             call oclRead4DFloatArrayBuffer(br_in_buf, br_in_sz, br_in)
             call oclRead4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
             
-        end subroutine read_halos_out
+        end subroutine read_ext_halos_out
             
             
         ! Test functions

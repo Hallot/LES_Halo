@@ -10,6 +10,7 @@ module module_LES_combined_ocl
     integer :: init_compare_halos = 0
     integer :: init_write_fgh_old_to_file = 0
     integer :: init_run_LES_kernel = 0
+    integer :: init_read_ext_halos_out = 0
     integer :: init_initialise_LES_kernel = 0
     integer :: init_write_uvw_p_uvwsum_to_file = 0
     integer :: init_read_halos_out = 0
@@ -19,7 +20,7 @@ contains
 
 
 
-    subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         , tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in,         t_out, r_out, b_out, l_out         )
+    subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         )
         use oclWrapper
         use params_common_sn
         implicit none
@@ -71,8 +72,14 @@ contains
         integer, intent(In) :: jm
         integer, intent(In) :: km
 ! integer, intent(In) :: nmax
-        real(kind=4), dimension(4, 1:ip+3, 1:jp+3, 1:kp+3), intent(InOut) :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
-        real(kind=4), dimension(4, 1:ip+5, 1:jp+3, 1:kp+3), intent(InOut) :: t_out, b_out
+        integer, parameter :: v_dim = 4
+        integer, parameter :: h_w = 1
+        integer, parameter :: h_h = 1
+        integer, parameter :: h_d = kp + 3
+        integer, parameter :: c_w = ip + 3
+        integer, parameter :: c_h = jp + 3
+        real(kind=4), dimension(v_dim, c_w, c_h, h_d) :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
+        real(kind=4), dimension(v_dim, c_w + 2 * h_w, c_h, h_d) :: t_out, b_out
         ! -----------------------------------------------------------------------
         ! Combined arrays for OpenCL kernels
         real(kind=4), dimension(0:3,0:ip+1,-1:jp+1,-1:kp+1) :: uvw
@@ -500,8 +507,14 @@ contains
         real(kind=4), dimension(512) :: chunks_num, chunks_denom
         integer, dimension(256) :: n_ptr
         integer, dimension(256) :: state_ptr
-        real(kind=4), dimension(4, 1:ip+3, 1:jp+3, 1:kp+3) :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
-        real(kind=4), dimension(4, 1:ip+5, 1:jp+3, 1:kp+3) :: t_out, b_out
+        integer, parameter :: v_dim = 4
+        integer, parameter :: h_w = 1
+        integer, parameter :: h_h = 1
+        integer, parameter :: h_d = kp + 3
+        integer, parameter :: c_w = ip + 3
+        integer, parameter :: c_h = jp + 3
+        real(kind=4), dimension(v_dim, c_w, c_h, h_d) :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
+        real(kind=4), dimension(v_dim, c_w + 2 * h_w, c_h, h_d) :: t_out, b_out
         integer(8) :: p_buf
         integer(8) :: uvw_buf
         integer(8) :: uvwsum_buf
@@ -580,6 +593,9 @@ contains
         !tl_in2 = 10.0
         !call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in2)
         !call compare_halos(tl_in, tl_in2, lb, ub)
+        call read_ext_halos_out(tl_in, tr_in, br_in, bl_in,             v_dim, h_w, h_h, h_d, c_w, c_h,             tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+        call read_halos_out(t_in, r_in, b_in, l_in,             v_dim, h_w, h_h, h_d, c_w, c_h,             t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+        call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out,             v_dim, h_w, h_h, h_d, c_w, c_h,             t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
         ! 2. Run the time/state nested loops, copying only time and state
@@ -792,6 +808,31 @@ contains
             call oclRead4DFloatArrayBuffer(b_in_buf, b_in_sz, b_in)
             call oclRead4DFloatArrayBuffer(l_in_buf, l_in_sz, l_in)
         end subroutine read_halos_out
+        ! Read the exterior inner halos from the device to the host
+        ! Test function for a single node
+        subroutine read_ext_halos_out(tl_in, tr_in, br_in, bl_in,             v_dim, h_w, h_h, h_d, c_w, c_h,             tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+            use oclWrapper
+            integer, intent (in) :: v_dim, h_w, h_h, h_d, c_w, c_h
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: tl_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: tr_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: br_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: bl_in
+            ! OpenCL buffer declarations
+            integer(8) :: tl_in_buf
+            integer(8) :: tr_in_buf
+            integer(8) :: br_in_buf
+            integer(8) :: bl_in_buf
+            ! OpenCL buffer size declarations
+            integer, dimension(4):: tl_in_sz
+            integer, dimension(4):: tr_in_sz
+            integer, dimension(4):: br_in_sz
+            integer, dimension(4):: bl_in_sz
+            ! Read halos from device
+            call oclRead4DFloatArrayBuffer(tl_in_buf, tl_in_sz, tl_in)
+            call oclRead4DFloatArrayBuffer(tr_in_buf, tr_in_sz, tr_in)
+            call oclRead4DFloatArrayBuffer(br_in_buf, br_in_sz, br_in)
+            call oclRead4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
+        end subroutine read_ext_halos_out
         ! Test functions
         ! Print the halos
         subroutine compare_halos(halo1, halo2, lb, ub)
