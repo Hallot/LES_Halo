@@ -162,19 +162,6 @@
         real(kind=4), dimension(jp,kp)  :: wind_profile
 #endif
 
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: tl_in
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: t_in
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: tr_in
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: r_in
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: br_in 
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: b_in
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: bl_in
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: l_in
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: t_out
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: r_out
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: b_out
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: l_out
-
         !WV NOTE ipmax, jpmax are needed because the zbm array is read from a file and needs to be large enough
         !WV Otherwise the only supported domain is 150x150x90
         real(kind=4), dimension(-1:ipmax+1,-1:jpmax+1)  :: zbm
