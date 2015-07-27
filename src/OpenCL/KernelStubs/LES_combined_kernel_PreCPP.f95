@@ -52,6 +52,7 @@ contains
         integer, intent(In) :: jm
         integer, intent(In) :: km
         
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out
+        real(kind=4), dimension(4, 1:ip+3, 1:jp+3, 1:kp+3), intent(InOut)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
+        real(kind=4), dimension(4, 1:ip+5, 1:jp+3, 1:kp+3), intent(InOut)  :: t_out, b_out
 !
 end module module_LES_combined_kernel

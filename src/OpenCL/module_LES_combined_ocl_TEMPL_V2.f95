@@ -92,8 +92,8 @@ contains
         integer, intent(In) :: km
 !        integer, intent(In) :: nmax
 
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut)  :: tl_in
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut)  :: t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out
+        real(kind=4), dimension(4, 1:ip+3, 1:jp+3, 1:kp+3), intent(InOut)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
+        real(kind=4), dimension(4, 1:ip+5, 1:jp+3, 1:kp+3), intent(InOut)  :: t_out, b_out
 
         ! -----------------------------------------------------------------------
         ! Combined arrays for OpenCL kernels
@@ -166,6 +166,17 @@ contains
         oclBuffers(11) = wind_profile_buf ! BONDV1
 #endif
         oclBuffers(12) = tl_in_buf ! Halo
+        oclBuffers(13) = t_in_buf ! Halo
+        oclBuffers(14) = tr_in_buf ! Halo
+        oclBuffers(15) = r_in_buf ! Halo
+        oclBuffers(16) = br_in_buf ! Halo
+        oclBuffers(17) = b_in_buf ! Halo
+        oclBuffers(18) = bl_in_buf ! Halo
+        oclBuffers(19) = l_in_buf ! Halo
+        oclBuffers(20) = t_out_buf ! Halo
+        oclBuffers(21) = r_out_buf ! Halo
+        oclBuffers(22) = b_out_buf ! Halo
+        oclBuffers(23) = l_out_buf ! Halo
         oclNunits = initialise_LES_kernel_nunits
         oclNthreadsHint = initialise_LES_kernel_nthreads
 
@@ -248,7 +259,8 @@ contains
         integer, dimension(256) :: n_ptr
         integer, dimension(256) :: state_ptr
         
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: tl_in
+        real(kind=4), dimension(4, 1:ip+3, 1:jp+3, 1:kp+3)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
+        real(kind=4), dimension(4, 1:ip+5, 1:jp+3, 1:kp+3) :: t_out, b_out
         
         integer(8) :: p_buf
         integer(8) :: uvw_buf
@@ -256,16 +268,16 @@ contains
         integer(8) :: fgh_old_buf, fgh_buf
         integer(8) :: chunks_num_buf, chunks_denom_buf
         integer(8) :: val_ptr_buf, n_ptr_buf, state_ptr_buf
-        integer(8) :: tl_in_buf
+        integer(8) :: tl_in_buf, t_in_buf, tr_in_buf, r_in_buf, br_in_buf, b_in_buf, bl_in_buf, l_in_buf, t_out_buf, r_out_buf, b_out_buf, l_out_buf
 #ifdef EXTERNAL_WIND_PROFILE
         real(kind=4), dimension(jp,kp) , intent(In) :: wind_profile
-        integer(8) :: wind_profile_buf
+        integer(8) :: wind_profile_bufshape(l_out)
         integer, dimension(2) :: wind_profile_sz
 #endif
 
         integer, dimension(4) :: p_sz, uvw_sz, uvwsum_sz, fgh_old_sz,fgh_sz
         integer, dimension(1) :: state_ptr_sz, n_ptr_sz, val_ptr_sz, chunks_num_sz, chunks_denom_sz
-        integer, dimension(3) :: tl_in_sz
+        integer, dimension(4) :: tl_in_sz, t_in_sz, tr_in_sz, r_in_sz, br_in_sz, b_in_sz, bl_in_sz, l_in_sz, t_out_sz, r_out_sz, b_out_sz, l_out_sz
 
         integer :: state, nn, ii
         real(kind=4) :: aaa, bbb, rhsav, area, pav, pco, sor
@@ -300,9 +312,6 @@ contains
 #endif
 
 
-        integer, dimension(3) :: lb = (/0,0,0/)
-        integer, dimension(3) :: ub = (/ip,jp,kp/)
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1)  :: tl_in2
 
         foldo=0
         goldo=0
@@ -321,6 +330,17 @@ contains
         wind_profile_buf = oclBuffers(11)  ! BONDV1
 #endif
         tl_in_buf = oclBuffers(12) ! Halo
+        t_in_buf = oclBuffers(13) ! Halo
+        tr_in_buf = oclBuffers(14) ! Halo
+        r_in_buf = oclBuffers(15) ! Halo
+        br_in_buf = oclBuffers(16) ! Halo
+        b_in_buf = oclBuffers(17) ! Halo
+        bl_in_buf = oclBuffers(18) ! Halo
+        l_in_buf = oclBuffers(19) ! Halo
+        t_out_buf = oclBuffers(20) ! Halo
+        r_out_buf = oclBuffers(21) ! Halo
+        b_out_buf = oclBuffers(22) ! Halo
+        l_out_buf = oclBuffers(23) ! Halo
 
         p_sz = shape(po)
         uvw_sz = shape(uvw)
@@ -335,15 +355,31 @@ contains
 #ifdef EXTERNAL_WIND_PROFILE
         wind_profile_sz = shape(wind_profile)  ! BONDV1
 #endif
+        tl_in_sz = shape(tl_in)
+        t_in_sz = shape(t_in)
+        tr_in_sz = shape(tr_in)
+        r_in_sz = shape(r_in)
+        br_in_sz = shape(br_in)
+        b_in_sz = shape(b_in)
+        bl_in_sz = shape(bl_in)
+        l_in_sz = shape(l_in)
+        t_out_sz = shape(t_out)
+        r_out_sz = shape(r_out)
+        b_out_sz = shape(b_out)
+        l_out_sz = shape(l_out)
 
         n_ptr(1)=n
 #ifdef TIMINGS
          print *, 'run_LES_kernel: time step = ',n
 #endif
 
-        call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in2)
-        print *, 'run_LES_kernel: time step = ', tl_in2
-        call compare_halos(tl_in, tl_in2, lb, ub)
+        !call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in)
+        !call compare_halos(tl_in, tl_in2, lb, ub)
+        !tl_in2 = 2.0
+        !call oclWrite3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in2)
+        !tl_in2 = 10.0
+        !call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in2)
+        !call compare_halos(tl_in, tl_in2, lb, ub)
 
 
         ! ========================================================================================================================================================
@@ -761,92 +797,87 @@ contains
         
         
         ! Write the inner halos received in the outer halos
-        subroutine merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, v_dim, h_w, h_h, h_d, c_w, c_h)
+        subroutine merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+            v_dim, h_w, h_h, h_d, c_w, c_h, &
+            t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
             integer, intent (in) :: v_dim, h_w, h_h, h_d, c_w, c_h
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(in)  :: tl_in
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(in)  :: t_in
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(in)  :: tr_in
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(in)  :: r_in
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(in)  :: br_in
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(in)  :: b_in
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(in)  :: bl_in
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(in)  :: l_in
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(out)  :: t_out
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(out)  :: b_out
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in)  :: tl_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in)  :: t_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in)  :: tr_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in)  :: r_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in)  :: br_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in)  :: b_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in)  :: bl_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in)  :: l_in
+            real(kind=4), dimension(v_dim, c_w + 2 * h_w, h_h, h_d), intent(out)  :: t_out
+            real(kind=4), dimension(v_dim, c_w + 2 * h_w, h_h, h_d), intent(out)  :: b_out
             integer :: i_axis, j_axis, k_axis
             
             ! OpenCL buffer declarations
-            integer(8) :: tout_buf
-            integer(8) :: rout_buf
-            integer(8) :: bout_buf
-            integer(8) :: lout_buf
+            integer(8) :: t_out_buf
+            integer(8) :: r_out_buf
+            integer(8) :: b_out_buf
+            integer(8) :: l_out_buf
             ! OpenCL buffer size declarations
-            integer, dimension(4):: tout_sz
-            integer, dimension(4):: rout_sz
-            integer, dimension(4):: bout_sz
-            integer, dimension(4):: lout_sz
+            integer, dimension(4):: t_out_sz
+            integer, dimension(4):: r_out_sz
+            integer, dimension(4):: b_out_sz
+            integer, dimension(4):: l_out_sz
             
             ! Write the correct data inside the buffers
-            do j_axis = 0, h_h
-                do k_axis = 0, h_d
+            do j_axis = 1, h_h
+                do k_axis = 1, h_d
                     do i_axis = (c_w - h_w), c_w ! Left side
-                        t_out(0:v_dim, i_axis - (c_w - h_w), j_axis, k_axis) = tl_in(0:v_dim, i_axis, j_axis, k_axis)
-                        b_out(0:v_dim, i_axis - (c_w - h_w), j_axis, k_axis) = bl_in(0:v_dim, i_axis, j_axis, k_axis)
+                        t_out(v_dim, i_axis - (c_w - h_w) + 1, j_axis, k_axis) = tl_in(v_dim, i_axis, j_axis, k_axis)
+                        b_out(v_dim, i_axis - (c_w - h_w) + 1, j_axis, k_axis) = bl_in(v_dim, i_axis, j_axis, k_axis)
                     end do !i
-                    do i_axis = 0, c_w ! Center
-                        t_out(0:v_dim, i_axis, j_axis, k_axis) = t_in(0:v_dim, i_axis, j_axis, k_axis)
-                        b_out(0:v_dim, i_axis, j_axis, k_axis) = b_in(0:v_dim, i_axis, j_axis, k_axis)
+                    do i_axis = 1, c_w ! Center
+                        t_out(v_dim, i_axis + h_w, j_axis, k_axis) = t_in(v_dim, i_axis, j_axis, k_axis)
+                        b_out(v_dim, i_axis + h_w, j_axis, k_axis) = b_in(v_dim, i_axis, j_axis, k_axis)
                     end do !i
-                    do i_axis= 0, h_w ! Right side
-                        t_out(0:v_dim, c_w + i_axis, j_axis, k_axis) = t_in(0:v_dim, i_axis, j_axis, k_axis)
-                        b_out(0:v_dim, c_w + i_axis, j_axis, k_axis) = b_in(0:v_dim, i_axis, j_axis, k_axis)
+                    do i_axis= 1, h_w ! Right side
+                        t_out(v_dim, c_w + i_axis, j_axis, k_axis) = tr_in(v_dim, i_axis, j_axis, k_axis)
+                        b_out(v_dim, c_w + i_axis, j_axis, k_axis) = br_in(v_dim, i_axis, j_axis, k_axis)
                     end do !i
                 end do !k
             end do !j
             
-            ! OpenCL buffer sizes
-            tout_sz = size(t_out)
-            rout_sz = size(r_in)
-            bout_sz = size(b_out)
-            lout_sz = size(l_in)
-            
-            ! Create OpenCL buffers
-            call oclMake4DFloatArrayReadWriteBuffer(tout_buf, tout_sz, t_out)
-            call oclMake4DFloatArrayReadWriteBuffer(rout_buf, rout_sz, r_in)
-            call oclMake4DFloatArrayReadWriteBuffer(bout_buf, bout_sz, b_out)
-            call oclMake4DFloatArrayReadWriteBuffer(lout_buf, lout_sz, l_in)
-            
-            ! Set OpenCL argument order
-            call oclSetFloatArrayArg(0, tout_buf)
-            call oclSetFloatArrayArg(1, rout_buf)
-            call oclSetFloatArrayArg(2, bout_buf)
-            call oclSetFloatArrayArg(3, lout_buf)
             
             ! Write the buffers to device
-            call oclWrite4DFloatArrayBuffer(tout_buf, tout_sz, t_out)
-            call oclWrite4DFloatArrayBuffer(rout_buf, rout_sz, r_in)
-            call oclWrite4DFloatArrayBuffer(bout_buf, bout_sz, b_out)
-            call oclWrite4DFloatArrayBuffer(lout_buf, lout_sz, l_in)
+            call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, t_out)
+            call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, r_in)
+            call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, b_out)
+            call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, l_in)
                 
         end subroutine merge_halos_in
         
         ! Read the inner halos from the device to the host
-        subroutine read_halos_out(tl_out, t_out, tr_out, r_out, br_out, b_out, bl_out, l_out, v_dim, h_w, h_h, h_d, tout_buf, tout_sz)
+        subroutine read_halos_out(tl_out, t_out, tr_out, r_out, br_out, b_out, bl_out, l_out, &
+            v_dim, h_w, h_h, h_d, &
+            t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
             integer, intent (in) :: v_dim, h_w, h_h, h_d
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(out)  :: tl_out
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(out)  :: t_out
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(out)  :: tr_out
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(out)  :: r_out
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(out)  :: br_out
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(out)  :: b_out
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(out)  :: bl_out
-            real(kind=4), dimension(0:v_dim, h_w, h_h, h_d), intent(out)  :: l_out
+            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out)  :: tl_out
+            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out)  :: t_out
+            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out)  :: tr_out
+            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out)  :: r_out
+            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out)  :: br_out
+            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out)  :: b_out
+            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out)  :: bl_out
+            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out)  :: l_out
             
-            integer(8) :: tout_buf
-            integer, dimension(4):: tout_sz
+            ! OpenCL buffer declarations
+            integer(8) :: t_out_buf
+            integer(8) :: r_out_buf
+            integer(8) :: b_out_buf
+            integer(8) :: l_out_buf
+            ! OpenCL buffer size declarations
+            integer, dimension(4):: t_out_sz
+            integer, dimension(4):: r_out_sz
+            integer, dimension(4):: b_out_sz
+            integer, dimension(4):: l_out_sz
             
             ! Read halos from device
-            call oclRead4DFloatArrayBuffer(tout_buf, tout_sz, t_out)
+            !call oclRead4DFloatArrayBuffer(tout_buf, tout_sz, t_out)
         end subroutine read_halos_out
             
             
