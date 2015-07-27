@@ -769,29 +769,28 @@ contains
             call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, l_in)
         end subroutine merge_halos_in
         ! Read the inner halos from the device to the host
-        subroutine read_halos_out(tl_out, t_out, tr_out, r_out, br_out, b_out, bl_out, l_out,             v_dim, h_w, h_h, h_d,             t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
+        subroutine read_halos_out(t_in, r_in, b_in, l_in,             v_dim, h_w, h_h, h_d, c_w, c_h,             t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
             use oclWrapper
-            integer, intent (in) :: v_dim, h_w, h_h, h_d
-            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out) :: tl_out
-            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out) :: t_out
-            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out) :: tr_out
-            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out) :: r_out
-            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out) :: br_out
-            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out) :: b_out
-            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out) :: bl_out
-            real(kind=4), dimension(v_dim, h_w, h_h, h_d), intent(out) :: l_out
+            integer, intent (in) :: v_dim, h_w, h_h, h_d, c_w, c_h
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: t_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: r_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: b_in
+            real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(out) :: l_in
             ! OpenCL buffer declarations
-            integer(8) :: t_out_buf
-            integer(8) :: r_out_buf
-            integer(8) :: b_out_buf
-            integer(8) :: l_out_buf
+            integer(8) :: t_in_buf
+            integer(8) :: r_in_buf
+            integer(8) :: b_in_buf
+            integer(8) :: l_in_buf
             ! OpenCL buffer size declarations
-            integer, dimension(4):: t_out_sz
-            integer, dimension(4):: r_out_sz
-            integer, dimension(4):: b_out_sz
-            integer, dimension(4):: l_out_sz
+            integer, dimension(4):: t_in_sz
+            integer, dimension(4):: r_in_sz
+            integer, dimension(4):: b_in_sz
+            integer, dimension(4):: l_in_sz
             ! Read halos from device
-            !call oclRead4DFloatArrayBuffer(tout_buf, tout_sz, t_out)
+            call oclRead4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
+            call oclRead4DFloatArrayBuffer(r_in_buf, r_in_sz, r_in)
+            call oclRead4DFloatArrayBuffer(b_in_buf, b_in_sz, b_in)
+            call oclRead4DFloatArrayBuffer(l_in_buf, l_in_sz, l_in)
         end subroutine read_halos_out
         ! Test functions
         ! Print the halos
