@@ -611,7 +611,9 @@ contains
         call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
         call read_ext_halos_out(tl_in, tr_in, br_in, bl_in,             v_dim, h_h, h_d, c_w,             tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
         call read_halos_out(t_in, r_in, b_in, l_in,             v_dim, h_h, h_d, c_w,             t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
-        call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out,             v_dim, h_w, h_h, h_d, c_w, c_h,             t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
+        call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out,             v_dim, h_w, h_h, h_d, c_w,             t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
+            call oclRead4DFloatArrayBuffer(t_out_buf, t_out_sz, t_out)
+            print *, 't_out',t_out
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
         ! 2. Run the time/state nested loops, copying only time and state
@@ -753,9 +755,9 @@ contains
 ! END of NO_COMPUTE
         end subroutine run_LES_kernel
         ! Write the inner halos received in the outer halos
-        subroutine merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out,             v_dim, h_w, h_h, h_d, c_w, c_h,             t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
+        subroutine merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out,             v_dim, h_w, h_h, h_d, c_w,             t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
             use oclWrapper
-            integer, intent (in) :: v_dim, h_w, h_h, h_d, c_w, c_h
+            integer, intent (in) :: v_dim, h_w, h_h, h_d, c_w
             real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in) :: tl_in
             real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in) :: t_in
             real(kind=4), dimension(v_dim, c_w, h_h, h_d), intent(in) :: tr_in
