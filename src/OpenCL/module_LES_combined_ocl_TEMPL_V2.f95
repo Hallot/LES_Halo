@@ -329,6 +329,9 @@ contains
         real (kind=4), dimension(0:12) :: ktimestamp
 #endif
 
+        integer, dimension(4), parameter :: lb = (/1,1,1,1/), ub = (/v_dim, ip + 3, jp + 3, kp + 3/)
+        
+
 
 
         foldo=0
@@ -441,7 +444,7 @@ contains
             
         call oclRead4DFloatArrayBuffer(t_out_buf, t_out_sz, b_out)
         
-        !call compare_halos(t_out, b_out, 1, :)
+        call compare_halos(t_out, b_out, lb, ub)
 
 
         ! ========================================================================================================================================================

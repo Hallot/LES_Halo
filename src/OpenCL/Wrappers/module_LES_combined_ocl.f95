@@ -538,6 +538,7 @@ contains
         integer, parameter :: ST_BONDV1_CALC_UVW__VELFG__FEEDBF__LES_CALC_SM=30, ST_VELFG=31, ST_FEEDBF__LES_CALC_SM=32
         integer, parameter :: ST_PRESS_RHSAV=7, ST_PRESS_SOR=8, ST_PRESS_PAV=9, ST_PRESS_ADJ=10, ST_PRESS_BOUNDP=11, ST_DONE=12
         real (kind=4) :: exectime
+        integer, dimension(4), parameter :: lb = (/1,1,1,1/), ub = (/v_dim, ip + 3, jp + 3, kp + 3/)
         foldo=0
         goldo=0
         holdo=0
@@ -619,7 +620,7 @@ contains
         call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out,             v_dim, h_w, h_h, h_d, c_w,             t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
         b_out = -2.0
         call oclRead4DFloatArrayBuffer(t_out_buf, t_out_sz, b_out)
-        !call compare_halos(t_out, b_out, 1, :)
+        call compare_halos(t_out, b_out, lb, ub)
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
         ! 2. Run the time/state nested loops, copying only time and state
