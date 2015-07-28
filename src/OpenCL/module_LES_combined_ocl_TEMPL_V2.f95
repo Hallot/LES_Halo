@@ -274,6 +274,9 @@ contains
         integer, parameter :: c_h = jp + 3
         real(kind=4), dimension(v_dim, c_w, c_h, h_d)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
         real(kind=4), dimension(v_dim, c_w + 2 * h_w, c_h, h_d) :: t_out, b_out
+        !===== Test =====!
+        !real(kind=4), dimension(v_dim, c_w, c_h, h_d) :: test_halo
+        !real(kind=4), dimension(v_dim, c_w + 2 * h_w, c_h, h_d) :: big_test_halo
         
         integer(8) :: p_buf
         integer(8) :: uvw_buf
@@ -394,32 +397,24 @@ contains
          print *, 'run_LES_kernel: time step = ',n
 #endif
 
-        !call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in)
-        !call compare_halos(tl_in, tl_in2, lb, ub)
-        !tl_in2 = 2.0
-        !call oclWrite3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in2)
-        !tl_in2 = 10.0
-        !call oclRead3DFloatArrayBuffer(tl_in_buf,tl_in_sz,tl_in2)
-        !call compare_halos(tl_in, tl_in2, lb, ub)
-        
-        tl_in = 1.0
-        t_in = 2.0
-        tr_in = 3.0
-        r_in = 4.0
-        br_in = 5.0
-        b_in = 6.0
-        bl_in = 7.0
-        l_in = 8.0
+        !tl_in = 1.0
+        !t_in = 2.0
+        !tr_in = 3.0
+        !r_in = 4.0
+        !br_in = 5.0
+        !b_in = 6.0
+        !bl_in = 7.0
+        !l_in = 8.0
         
         
-        call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
-        call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, r_in)
-        call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, b_in)
-        call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, l_in)
-        call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, tl_in)
-        call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, tr_in)
-        call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, br_in)
-        call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
+        !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
+        !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, r_in)
+        !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, b_in)
+        !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, l_in)
+        !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, tl_in)
+        !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, tr_in)
+        !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, br_in)
+        !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
         
         !call oclRead4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
         !t_in = 9.0
@@ -428,23 +423,23 @@ contains
         !call oclRead4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
          
         
-        call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
-            v_dim, h_h, h_d, c_w, &
-            tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+        !call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+         !   v_dim, h_h, h_d, c_w, &
+          !  tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
             
-        call read_halos_out(t_in, r_in, b_in, l_in, &
-            v_dim, h_h, h_d, c_w, &
-            t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+        !call read_halos_out(t_in, r_in, b_in, l_in, &
+         !   v_dim, h_h, h_d, c_w, &
+          !  t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
         
-        call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
-            v_dim, h_w, h_h, h_d, c_w, &
-            t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
+        !call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+         !   v_dim, h_w, h_h, h_d, c_w, &
+          !  t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
             
-        b_out = -2.0
+        !b_out = -2.0
             
-        call oclRead4DFloatArrayBuffer(t_out_buf, t_out_sz, b_out)
+        !call oclRead4DFloatArrayBuffer(t_out_buf, t_out_sz, b_out)
         
-        call compare_halos(t_out, b_out, lb, ub)
+        !call compare_halos(t_out, b_out, lb, ub)
 
 
         ! ========================================================================================================================================================
@@ -474,6 +469,43 @@ contains
 #endif
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    ! Read the inner halos, those are going to be exchanged ot the other nodes
+                    call read_halos_out(t_in, r_in, b_in, l_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                        
+                    ! Here we receive the halos from the other nodes
+                    ! Since there are no other nodes for now, we just read the missing halos ourselves
+                    call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                        
+                    !========= Test ========!
+                    ! Wipe the halos between the reading and writing
+                    ! Just to make sure thing are working correctly
+                    ! To be removed later once tested
+                    !test_halo = -1.0
+                    !big_test_halo = -1.0
+                    !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                    
+                        
+                    ! Merge the halos that have been received from the other nodes into the outer halos
+                    call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                        v_dim, h_w, h_h, h_d, c_w, &
+                        t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
+                    
 #ifdef TIMINGS
                     ktimestamp(ST_INIT) = exectime
 #endif
@@ -973,10 +1005,12 @@ contains
             call oclRead4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
             
         end subroutine read_ext_halos_out
-            
+        
+        
+        
             
         ! Test functions
-        ! Print the halos
+        ! Print the halos if different
         subroutine compare_halos(halo1, halo2, lb, ub)
             use module_LES_tests
             
