@@ -418,6 +418,12 @@ contains
         call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, br_in)
         call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
         
+        !call oclRead4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
+        !t_in = 9.0
+        !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
+        !t_in = 2.0
+        !call oclRead4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
+         
         
         call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
             v_dim, h_h, h_d, c_w, &
@@ -431,9 +437,11 @@ contains
             v_dim, h_w, h_h, h_d, c_w, &
             t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
             
-            call oclRead4DFloatArrayBuffer(t_out_buf, t_out_sz, t_out)
+        b_out = -2.0
             
-            print *, 't_out',t_out
+        call oclRead4DFloatArrayBuffer(t_out_buf, t_out_sz, b_out)
+        
+        !call compare_halos(t_out, b_out, 1, :)
 
 
         ! ========================================================================================================================================================
@@ -896,7 +904,6 @@ contains
                 end do !k
             end do !j
             
-            
             ! Write the buffers to device
             call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, t_out)
             call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, r_in)
@@ -970,10 +977,10 @@ contains
         subroutine compare_halos(halo1, halo2, lb, ub)
             use module_LES_tests
             
-            integer, dimension(3) :: ub
-            integer, dimension(3) :: lb
-            real(kind=4), dimension(lb(1):ub(1),lb(2):ub(2),lb(3):ub(3)) :: halo1, halo2
-            call compare_3D_real_arrays (halo1, halo2, lb, ub)
+            integer, dimension(4) :: ub
+            integer, dimension(4) :: lb
+            real(kind=4), dimension(lb(1):ub(1),lb(2):ub(2),lb(3):ub(3),lb(4):ub(4)) :: halo1, halo2
+            call compare_4D_real_arrays (halo1, halo2, lb, ub)
         end subroutine
      
         ! --------------------------------------------------------------------------------

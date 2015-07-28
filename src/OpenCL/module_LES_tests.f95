@@ -366,6 +366,44 @@ module module_LES_tests
             print *, "NOK!",nok_ct,'/',ip*jp*kp
         end if                                    
     end subroutine
+    
+    subroutine compare_4D_real_arrays (a,ao,lb,ub) 
+        use params_common_sn
+        integer, dimension(4) :: ub
+        integer, dimension(4) :: lb
+        real(kind=4), dimension(lb(1):ub(1),lb(2):ub(2),lb(3):ub(3),lb(4):ub(4)) :: a,ao
+        integer hh,ii,jj,kk,ok,nok_ct
+        real(kind=4) :: rel_error
+#ifdef MAX_REL_ERROR
+        real, parameter :: max_rel_error = MAX_REL_ERROR
+#else        
+        real, parameter :: max_rel_error = 0.000005
+#endif        
+        ok = 1
+        nok_ct=0
+        do hh = lb(1),ub(1)
+            do ii = lb(2),ub(2)
+                do jj = lb(3),ub(3)
+                    do kk = lb(4),ub(4)
+                        if ( a(hh,ii,jj,kk) /= ao(hh,ii,jj,kk) ) then
+                            ! we allow a 5*10^-6 error, ad hoc, seems to be a rounding difference, worse on GPU
+                            rel_error = abs( (a(hh,ii,jj,kk) - ao(hh,ii,jj,kk) ) / a(hh,ii,jj,kk) )
+                            if ( rel_error > max_rel_error) then
+                                print * , '(',hh,ii,jj,kk,')',a(hh,ii,jj,kk) ,'<>',ao(hh,ii,jj,kk) ,' rel. error = ',rel_error
+                                ok=0
+                                nok_ct=nok_ct+1
+                            end if
+                        end if
+                    end do
+                end do
+            end do
+        end do
+        if (ok == 1) then
+            print *, "OK!"
+        else
+            print *, "NOK!",nok_ct,'/',ip*jp*kp
+        end if                                    
+    end subroutine
 
     subroutine uvw_sum_dom (u,v,w)
         use params_common_sn

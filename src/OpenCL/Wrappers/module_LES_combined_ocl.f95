@@ -609,11 +609,17 @@ contains
         call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, tr_in)
         call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, br_in)
         call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, bl_in)
+        !call oclRead4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
+        !t_in = 9.0
+        !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
+        !t_in = 2.0
+        !call oclRead4DFloatArrayBuffer(t_in_buf, t_in_sz, t_in)
         call read_ext_halos_out(tl_in, tr_in, br_in, bl_in,             v_dim, h_h, h_d, c_w,             tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
         call read_halos_out(t_in, r_in, b_in, l_in,             v_dim, h_h, h_d, c_w,             t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
         call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out,             v_dim, h_w, h_h, h_d, c_w,             t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
-            call oclRead4DFloatArrayBuffer(t_out_buf, t_out_sz, t_out)
-            print *, 't_out',t_out
+        b_out = -2.0
+        call oclRead4DFloatArrayBuffer(t_out_buf, t_out_sz, b_out)
+        !call compare_halos(t_out, b_out, 1, :)
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
         ! 2. Run the time/state nested loops, copying only time and state
@@ -856,10 +862,10 @@ contains
         subroutine compare_halos(halo1, halo2, lb, ub)
             use oclWrapper
             use module_LES_tests
-            integer, dimension(3) :: ub
-            integer, dimension(3) :: lb
-            real(kind=4), dimension(lb(1):ub(1),lb(2):ub(2),lb(3):ub(3)) :: halo1, halo2
-            call compare_3D_real_arrays (halo1, halo2, lb, ub)
+            integer, dimension(4) :: ub
+            integer, dimension(4) :: lb
+            real(kind=4), dimension(lb(1):ub(1),lb(2):ub(2),lb(3):ub(3),lb(4):ub(4)) :: halo1, halo2
+            call compare_4D_real_arrays (halo1, halo2, lb, ub)
         end subroutine
         ! --------------------------------------------------------------------------------
         ! --------------------------------------------------------------------------------
