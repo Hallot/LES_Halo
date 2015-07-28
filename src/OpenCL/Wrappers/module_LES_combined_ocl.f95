@@ -790,16 +790,16 @@ contains
             do j_axis = 1, h_h
                 do k_axis = 1, h_d
                     do i_axis = (c_w - h_w), c_w ! Left side
-                        t_out(v_dim, i_axis - (c_w - h_w) + 1, j_axis, k_axis) = tl_in(v_dim, i_axis, j_axis, k_axis)
-                        b_out(v_dim, i_axis - (c_w - h_w) + 1, j_axis, k_axis) = bl_in(v_dim, i_axis, j_axis, k_axis)
+                        t_out(1:v_dim, i_axis - (c_w - h_w) + 1, j_axis, k_axis) = tl_in(1:v_dim, i_axis, j_axis, k_axis)
+                        b_out(1:v_dim, i_axis - (c_w - h_w) + 1, j_axis, k_axis) = bl_in(1:v_dim, i_axis, j_axis, k_axis)
                     end do !i
                     do i_axis = 1, c_w ! Center
-                        t_out(v_dim, i_axis + h_w, j_axis, k_axis) = t_in(v_dim, i_axis, j_axis, k_axis)
-                        b_out(v_dim, i_axis + h_w, j_axis, k_axis) = b_in(v_dim, i_axis, j_axis, k_axis)
+                        t_out(1:v_dim, i_axis + h_w, j_axis, k_axis) = t_in(1:v_dim, i_axis, j_axis, k_axis)
+                        b_out(1:v_dim, i_axis + h_w, j_axis, k_axis) = b_in(1:v_dim, i_axis, j_axis, k_axis)
                     end do !i
                     do i_axis= 1, h_w ! Right side
-                        t_out(v_dim, c_w + i_axis, j_axis, k_axis) = tr_in(v_dim, i_axis, j_axis, k_axis)
-                        b_out(v_dim, c_w + i_axis, j_axis, k_axis) = br_in(v_dim, i_axis, j_axis, k_axis)
+                        t_out(1:v_dim, c_w + i_axis, j_axis, k_axis) = tr_in(1:v_dim, i_axis, j_axis, k_axis)
+                        b_out(1:v_dim, c_w + i_axis, j_axis, k_axis) = br_in(1:v_dim, i_axis, j_axis, k_axis)
                     end do !i
                 end do !k
             end do !j
