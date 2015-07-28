@@ -528,6 +528,42 @@ contains
 #endif
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    ! Read the inner halos, those are going to be exchanged ot the other nodes
+                    call read_halos_out(t_in, r_in, b_in, l_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                        
+                    ! Here we receive the halos from the other nodes
+                    ! Since there are no other nodes for now, we just read the missing halos ourselves
+                    call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                        
+                    !========= Test ========!
+                    ! Wipe the halos between the reading and writing
+                    ! Just to make sure thing are working correctly
+                    ! To be removed later once tested
+                    !test_halo = -1.0
+                    !big_test_halo = -1.0
+                    !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                    
+                        
+                    ! Merge the halos that have been received from the other nodes into the outer halos
+                    call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                        v_dim, h_w, h_h, h_d, c_w, &
+                        t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 #ifdef TIMINGS
                     ktimestamp(ST_BONDV1_CALC_UOUT) = exectime
 #endif
@@ -556,6 +592,42 @@ contains
                     call oclWrite1DFloatArrayBuffer(val_ptr_buf,val_ptr_sz, val_ptr)
 #endif
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    ! Read the inner halos, those are going to be exchanged ot the other nodes
+                    call read_halos_out(t_in, r_in, b_in, l_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                        
+                    ! Here we receive the halos from the other nodes
+                    ! Since there are no other nodes for now, we just read the missing halos ourselves
+                    call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                        
+                    !========= Test ========!
+                    ! Wipe the halos between the reading and writing
+                    ! Just to make sure thing are working correctly
+                    ! To be removed later once tested
+                    !test_halo = -1.0
+                    !big_test_halo = -1.0
+                    !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                    
+                        
+                    ! Merge the halos that have been received from the other nodes into the outer halos
+                    call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                        v_dim, h_w, h_h, h_d, c_w, &
+                        t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 #ifdef TIMINGS
                     ktimestamp(ST_BONDV1_CALC_UVW) = exectime
 #endif
@@ -573,6 +645,42 @@ contains
 #endif
                     oclLocalRange=0
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    ! Read the inner halos, those are going to be exchanged ot the other nodes
+                    call read_halos_out(t_in, r_in, b_in, l_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                        
+                    ! Here we receive the halos from the other nodes
+                    ! Since there are no other nodes for now, we just read the missing halos ourselves
+                    call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                        
+                    !========= Test ========!
+                    ! Wipe the halos between the reading and writing
+                    ! Just to make sure thing are working correctly
+                    ! To be removed later once tested
+                    !test_halo = -1.0
+                    !big_test_halo = -1.0
+                    !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                    
+                        
+                    ! Merge the halos that have been received from the other nodes into the outer halos
+                    call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                        v_dim, h_w, h_h, h_d, c_w, &
+                        t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 #ifdef TIMINGS
                     ktimestamp(ST_VELFG__FEEDBF__LES_CALC_SM) = exectime
 #endif
@@ -593,6 +701,42 @@ contains
 #error "Value for KERNEL not supported!"
 #endif
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    ! Read the inner halos, those are going to be exchanged ot the other nodes
+                    call read_halos_out(t_in, r_in, b_in, l_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                        
+                    ! Here we receive the halos from the other nodes
+                    ! Since there are no other nodes for now, we just read the missing halos ourselves
+                    call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                        
+                    !========= Test ========!
+                    ! Wipe the halos between the reading and writing
+                    ! Just to make sure thing are working correctly
+                    ! To be removed later once tested
+                    !test_halo = -1.0
+                    !big_test_halo = -1.0
+                    !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                    
+                        
+                    ! Merge the halos that have been received from the other nodes into the outer halos
+                    call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                        v_dim, h_w, h_h, h_d, c_w, &
+                        t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 #ifdef TIMINGS
                     ktimestamp(ST_LES_BOUND_SM) = exectime
 #endif
@@ -606,6 +750,42 @@ contains
                     oclLocalRange=0
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    ! Read the inner halos, those are going to be exchanged ot the other nodes
+                    call read_halos_out(t_in, r_in, b_in, l_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                        
+                    ! Here we receive the halos from the other nodes
+                    ! Since there are no other nodes for now, we just read the missing halos ourselves
+                    call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                        
+                    !========= Test ========!
+                    ! Wipe the halos between the reading and writing
+                    ! Just to make sure thing are working correctly
+                    ! To be removed later once tested
+                    !test_halo = -1.0
+                    !big_test_halo = -1.0
+                    !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                    
+                        
+                    ! Merge the halos that have been received from the other nodes into the outer halos
+                    call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                        v_dim, h_w, h_h, h_d, c_w, &
+                        t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 #ifdef TIMINGS
                     ktimestamp(ST_LES_CALC_VISC__ADAM) = exectime
 #endif
@@ -633,6 +813,42 @@ contains
 #error "Value for KERNEL not supported!"
 #endif
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    ! Read the inner halos, those are going to be exchanged ot the other nodes
+                    call read_halos_out(t_in, r_in, b_in, l_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                        
+                    ! Here we receive the halos from the other nodes
+                    ! Since there are no other nodes for now, we just read the missing halos ourselves
+                    call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                        v_dim, h_h, h_d, c_w, &
+                        tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                        
+                    !========= Test ========!
+                    ! Wipe the halos between the reading and writing
+                    ! Just to make sure thing are working correctly
+                    ! To be removed later once tested
+                    !test_halo = -1.0
+                    !big_test_halo = -1.0
+                    !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                    !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                    !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                    
+                        
+                    ! Merge the halos that have been received from the other nodes into the outer halos
+                    call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                        v_dim, h_w, h_h, h_d, c_w, &
+                        t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 #ifdef TIMINGS
                     ktimestamp(ST_PRESS_RHSAV) = exectime
 #endif
@@ -719,6 +935,42 @@ contains
                                 call oclWrite1DIntArrayBuffer(n_ptr_buf,n_ptr_sz, n_ptr)
 #endif
                                 call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                                
+                                ! Read the inner halos, those are going to be exchanged ot the other nodes
+                                call read_halos_out(t_in, r_in, b_in, l_in, &
+                                    v_dim, h_h, h_d, c_w, &
+                                    t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                                    
+                                ! Here we receive the halos from the other nodes
+                                ! Since there are no other nodes for now, we just read the missing halos ourselves
+                                call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                                    v_dim, h_h, h_d, c_w, &
+                                    tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                                    
+                                !========= Test ========!
+                                ! Wipe the halos between the reading and writing
+                                ! Just to make sure thing are working correctly
+                                ! To be removed later once tested
+                                !test_halo = -1.0
+                                !big_test_halo = -1.0
+                                !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                                !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                                !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                                !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                                !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                                !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                                !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                                !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                                !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                                !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                                !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                                !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                                
+                                    
+                                ! Merge the halos that have been received from the other nodes into the outer halos
+                                call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                                    v_dim, h_w, h_h, h_d, c_w, &
+                                    t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 #ifdef TIMINGS
                                 sor_exectime = sor_exectime + exectime
 #endif
@@ -767,6 +1019,42 @@ contains
 #endif
 
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        
+                        ! Read the inner halos, those are going to be exchanged ot the other nodes
+                        call read_halos_out(t_in, r_in, b_in, l_in, &
+                            v_dim, h_h, h_d, c_w, &
+                            t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                            
+                        ! Here we receive the halos from the other nodes
+                        ! Since there are no other nodes for now, we just read the missing halos ourselves
+                        call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                            v_dim, h_h, h_d, c_w, &
+                            tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                            
+                        !========= Test ========!
+                        ! Wipe the halos between the reading and writing
+                        ! Just to make sure thing are working correctly
+                        ! To be removed later once tested
+                        !test_halo = -1.0
+                        !big_test_halo = -1.0
+                        !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                        !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                        
+                            
+                        ! Merge the halos that have been received from the other nodes into the outer halos
+                        call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                            v_dim, h_w, h_h, h_d, c_w, &
+                            t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 #ifdef TIMINGS
                     ktimestamp(ST_PRESS_PAV) = exectime
 #endif
@@ -792,6 +1080,42 @@ contains
 
                         call oclWrite1DFloatArrayBuffer(val_ptr_buf,val_ptr_sz, val_ptr)
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        
+                        ! Read the inner halos, those are going to be exchanged ot the other nodes
+                        call read_halos_out(t_in, r_in, b_in, l_in, &
+                            v_dim, h_h, h_d, c_w, &
+                            t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                            
+                        ! Here we receive the halos from the other nodes
+                        ! Since there are no other nodes for now, we just read the missing halos ourselves
+                        call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                            v_dim, h_h, h_d, c_w, &
+                            tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                            
+                        !========= Test ========!
+                        ! Wipe the halos between the reading and writing
+                        ! Just to make sure thing are working correctly
+                        ! To be removed later once tested
+                        !test_halo = -1.0
+                        !big_test_halo = -1.0
+                        !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                        !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                        
+                            
+                        ! Merge the halos that have been received from the other nodes into the outer halos
+                        call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                            v_dim, h_w, h_h, h_d, c_w, &
+                            t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 #ifdef TIMINGS
                     ktimestamp(ST_PRESS_ADJ) = exectime
 #endif
@@ -813,6 +1137,42 @@ contains
 #error "Value for KERNEL not supported!"
 #endif
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        
+                        ! Read the inner halos, those are going to be exchanged ot the other nodes
+                        call read_halos_out(t_in, r_in, b_in, l_in, &
+                            v_dim, h_h, h_d, c_w, &
+                            t_in_buf, r_in_buf, b_in_buf, l_in_buf, t_in_sz, r_in_sz, b_in_sz, l_in_sz)
+                            
+                        ! Here we receive the halos from the other nodes
+                        ! Since there are no other nodes for now, we just read the missing halos ourselves
+                        call read_ext_halos_out(tl_in, tr_in, br_in, bl_in, &
+                            v_dim, h_h, h_d, c_w, &
+                            tl_in_buf, tr_in_buf, br_in_buf, bl_in_buf, tl_in_sz, tr_in_sz, br_in_sz, bl_in_sz)
+                            
+                        !========= Test ========!
+                        ! Wipe the halos between the reading and writing
+                        ! Just to make sure thing are working correctly
+                        ! To be removed later once tested
+                        !test_halo = -1.0
+                        !big_test_halo = -1.0
+                        !call oclWrite4DFloatArrayBuffer(t_in_buf, t_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(r_in_buf, r_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(b_in_buf, b_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(l_in_buf, l_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(tl_in_buf, tl_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(tr_in_buf, tr_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(br_in_buf, br_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(bl_in_buf, bl_in_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(r_out_buf, r_out_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
+                        !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
+                        !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
+                        
+                            
+                        ! Merge the halos that have been received from the other nodes into the outer halos
+                        call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
+                            v_dim, h_w, h_h, h_d, c_w, &
+                            t_out_buf, r_out_buf, b_out_buf, l_out_buf, t_out_sz, r_out_sz, b_out_sz, l_out_sz)
 #ifdef TIMINGS
                     ktimestamp(ST_PRESS_BOUNDP) = exectime
 #endif
