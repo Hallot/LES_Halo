@@ -10,7 +10,6 @@ contains
 #endif
         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s, &
         val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km &
-        , tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, r_out, b_out, l_out &
         )
 
       use common_sn
@@ -52,14 +51,5 @@ contains
         integer, intent(In) :: jm
         integer, intent(In) :: km
         
-        integer, parameter :: v_dim = 4
-        integer, parameter :: h_w = 1
-        integer, parameter :: h_h = 1
-        integer, parameter :: h_d = kp + 3
-        integer, parameter :: c_w = ip + 3
-        integer, parameter :: c_h = jp + 3
-        
-        real(kind=4), dimension(v_dim, c_w, c_h, h_d), intent(InOut)  :: tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, r_out, l_out
-        real(kind=4), dimension(v_dim, c_w + 2 * h_w, c_h, h_d), intent(InOut) :: t_out, b_out
 !
 end module module_LES_combined_kernel
