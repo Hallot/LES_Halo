@@ -115,6 +115,8 @@ envF['STATUS'] = status
 
 if with_ocl == '0':
     FFLAGS += ['-cpp','-Ofast', '-m64', '-Wall','-ffree-form', '-fconvert=big-endian', VERBOSE,TIMINGS]
+
+OclBuilder.mcModel = 'l'
 if OclBuilder.mcModel == 'm':    
   FFLAGS += ['-mcmodel=medium']
 elif OclBuilder.mcModel == 'l':    
@@ -198,5 +200,11 @@ if csources:
     envF.Append(LIBS=['csubs'])
     prog = envF.Program('les_ocl_main',fsources)
 else:
+    #print "=================TEST=================="
+    #envF.Replace(FORTRANFLAGS = FFLAGS)
+    #envF.Replace(F77FLAGS = FFLAGS)
+    #envF.Replace(F90FLAGS = FFLAGS)
+    #envF.Replace(F95FLAGS = FFLAGS)
+    #print "=================ENDTEST=================="
     prog = envF.Program('les_ocl_main',fsources)
 

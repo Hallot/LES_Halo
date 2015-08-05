@@ -875,6 +875,7 @@ contains
 #endif
                     call oclRead4DFloatArrayBuffer(p_buf,p_sz,po)
                     !print *, '!!!!!====== TEST ======!!!!'
+                    
                     call oclWrite1DFloatArrayBuffer(val_ptr_buf,val_ptr_sz, val_ptr)
                     iter = 0
                     sor = pjuge*1.1 ! just to be larger than pjuge
@@ -965,7 +966,6 @@ contains
                                 !call oclWrite4DFloatArrayBuffer(l_out_buf, l_out_sz, test_halo)
                                 !call oclWrite4DFloatArrayBuffer(t_out_buf, t_out_sz, big_test_halo)
                                 !call oclWrite4DFloatArrayBuffer(b_out_buf, b_out_sz, big_test_halo)
-                                
                                     
                                 ! Merge the halos that have been received from the other nodes into the outer halos
                                 call merge_halos_in(tl_in, t_in, tr_in, r_in, br_in, b_in, bl_in, l_in, t_out, b_out, &
