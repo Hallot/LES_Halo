@@ -493,6 +493,10 @@ contains
         uvw_halo_sz = shape(uvw_halo)
         fgh_halo_sz = shape(fgh_halo)
         n_ptr(1)=n
+        ! Tests
+        p_halo = 1.0
+        uvw_halo = 2.0
+        fgh_halo = 3.0
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
         ! 2. Run the time/state nested loops, copying only time and state
@@ -505,41 +509,83 @@ contains
                     oclGlobalRange=(ip+1)*jp*kp
                     oclLocalRange=0
                     call oclWrite1DIntArrayBuffer(n_ptr_buf,n_ptr_sz, n_ptr)
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                 case (ST_BONDV1_CALC_UOUT) ! REDUCTION
                     oclGlobalRange = jp
                     oclLocalRange = jp
                     ngroups = jp
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                 case (ST_BONDV1_CALC_UVW)
                     oclGlobalRange=(kp*jp)+(kp+2)*(ip+2)+(ip+3)*(jp+3)
                     oclLocalRange=0
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                 case (ST_VELFG__FEEDBF__LES_CALC_SM)
 !#define NEW_VELFG
                     oclGlobalRange=ip*jp*kp
                     oclLocalRange=0
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                 case (ST_LES_BOUND_SM)
                     max_range = max(ip+3,jp+3,kp+2)
                     oclGlobalRange = max_range*max_range
                     oclLocalRange = max_range
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                 case (ST_LES_CALC_VISC__ADAM)
                     oclGlobalRange=ip*jp*kp
                     oclLocalRange=0
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                 case (ST_PRESS_RHSAV)
                     oclGlobalRange=ip*kp
                     oclLocalRange=ip
                     ngroups = ip
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclRead1DFloatArrayBuffer(chunks_num_buf,chunks_num_sz,chunks_num)
                     call oclRead1DFloatArrayBuffer(chunks_denom_buf,chunks_denom_sz, chunks_denom)
                     ! Calc the average over the compute units
@@ -575,7 +621,13 @@ contains
                                 end if
                                 n_ptr(1)=nrd
                                 call oclWrite1DIntArrayBuffer(n_ptr_buf,n_ptr_sz, n_ptr)
+                                call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                                call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                                call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                                 call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                                call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                                call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                                call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                                 if (nrd == 1) then
                                     !read back chunks_num. Only once!
                                     call oclRead1DFloatArrayBuffer(chunks_num_buf,chunks_num_sz,chunks_num)
@@ -593,7 +645,13 @@ contains
                         oclGlobalRange = ip*kp
                         oclLocalRange = ip
                         ngroups = kp
+                        call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                        call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                         call oclRead1DFloatArrayBuffer(chunks_num_buf,chunks_num_sz,chunks_num)
                         call oclRead1DFloatArrayBuffer(chunks_denom_buf,chunks_denom_sz, chunks_denom)
                         ! Calc the average over the compute units
@@ -610,13 +668,25 @@ contains
                         oclGlobalRange=ip*jp*kp
                         oclLocalRange=0
                         call oclWrite1DFloatArrayBuffer(val_ptr_buf,val_ptr_sz, val_ptr)
+                        call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                        call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                     case (ST_PRESS_BOUNDP)
                         max_range = max((ip+2),(jp+2),(kp+2))
                         oclGlobalRange = max_range*max_range
                         oclLocalRange = max_range
+                        call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                         !
                         if ((mod(n,1000) == 0 .or. n == nmax)) then
                             ! read back results and write to file

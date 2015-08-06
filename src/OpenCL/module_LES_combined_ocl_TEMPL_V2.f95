@@ -363,6 +363,11 @@ contains
          print *, 'run_LES_kernel: time step = ',n
 #endif
 
+        ! Tests
+        p_halo = 1.0
+        uvw_halo = 2.0
+        fgh_halo = 3.0
+
 
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
@@ -390,7 +395,15 @@ contains
                     call oclWrite2DFloatArrayBuffer(wind_profile_buf,wind_profile_sz,wind_profile)
 #endif
 
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     
                     
                     
@@ -415,7 +428,15 @@ contains
 #error "Value for KERNEL not supported!"
 #endif
 
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     
                     
 #ifdef TIMINGS
@@ -445,7 +466,15 @@ contains
 #if KERNEL == CPU_KERNEL
                     call oclWrite1DFloatArrayBuffer(val_ptr_buf,val_ptr_sz, val_ptr)
 #endif
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     
                     
 #ifdef TIMINGS
@@ -464,7 +493,15 @@ contains
                     oclGlobalRange=ip*jp*kp
 #endif
                     oclLocalRange=0
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     
                     
 #ifdef TIMINGS
@@ -486,7 +523,15 @@ contains
 #else
 #error "Value for KERNEL not supported!"
 #endif
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     
                     
 #ifdef TIMINGS
@@ -501,7 +546,15 @@ contains
                     oclGlobalRange=ip*jp*kp
                     oclLocalRange=0
 
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     
                     
 #ifdef TIMINGS
@@ -530,7 +583,15 @@ contains
 #else
 #error "Value for KERNEL not supported!"
 #endif
+                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     
                     
 #ifdef TIMINGS
@@ -618,7 +679,15 @@ contains
                                 n_ptr(1)=nrd
                                 call oclWrite1DIntArrayBuffer(n_ptr_buf,n_ptr_sz, n_ptr)
 #endif
+                                call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                                call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                                call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                                 call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                                call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                                call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                                call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                                 
                                 
 #ifdef TIMINGS
@@ -668,7 +737,15 @@ contains
 #error "Value for KERNEL not supported!"
 #endif
 
+                        call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        
+                        call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                        call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                         
                         
 #ifdef TIMINGS
@@ -695,7 +772,15 @@ contains
                         oclLocalRange=0
 
                         call oclWrite1DFloatArrayBuffer(val_ptr_buf,val_ptr_sz, val_ptr)
+                        call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        
+                        call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                        call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                         
                         
 #ifdef TIMINGS
@@ -718,7 +803,15 @@ contains
 #else
 #error "Value for KERNEL not supported!"
 #endif
+                        call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        
+                        call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                         
                         
 #ifdef TIMINGS
