@@ -268,7 +268,10 @@ __kernel void LES_combined_kernel_mono (
   const float dt,
   const unsigned int im,
   const unsigned int jm,
-  const unsigned int km
+  const unsigned int km,
+                __global float *p_halo,
+                __global float *uvw_halo,
+                __global float *fgh_halo
         ) {
  unsigned int gl_id = get_global_id(0);
  unsigned int gr_id = get_group_id(0);

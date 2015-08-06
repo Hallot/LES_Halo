@@ -90,6 +90,16 @@ contains
         integer, intent(In) :: km
 !        integer, intent(In) :: nmax
 
+        ! Halos
+        ! Putting the size expressions directly in the arrays crash the combined script
+        ! Probably the * symbol
+        integer, parameter :: s_p = 8 * (ip+4) * (kp+2)
+        integer, parameter :: s_uvw = 8 * (ip+3) * (kp+3) 
+        integer, parameter :: s_fgh = 8 * (ip+2) * (kp+1) 
+        real(kind=4), dimension(s_p) :: p_halo
+        real(kind=4), dimension(s_uvw) :: uvw_halo
+        real(kind=4), dimension(s_fgh) :: fgh_halo
+
         ! -----------------------------------------------------------------------
         ! Combined arrays for OpenCL kernels
 
@@ -141,6 +151,7 @@ contains
 #endif
             cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,&
             val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km &
+            , p_halo, uvw_halo, fgh_halo &
             )
         !$ACC End Kernel
 

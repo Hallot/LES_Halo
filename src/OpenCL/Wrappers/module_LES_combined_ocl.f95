@@ -68,6 +68,15 @@ contains
         integer, intent(In) :: jm
         integer, intent(In) :: km
 ! integer, intent(In) :: nmax
+        ! Halos
+        ! Putting the size expressions directly in the arrays crash the combined script
+        ! Probably the * symbol
+        integer, parameter :: s_p = 8 * (ip+4) * (kp+2)
+        integer, parameter :: s_uvw = 8 * (ip+3) * (kp+3)
+        integer, parameter :: s_fgh = 8 * (ip+2) * (kp+1)
+        real(kind=4), dimension(s_p) :: p_halo
+        real(kind=4), dimension(s_uvw) :: uvw_halo
+        real(kind=4), dimension(s_fgh) :: fgh_halo
         ! -----------------------------------------------------------------------
         ! Combined arrays for OpenCL kernels
         real(kind=4), dimension(0:3,0:ip+1,-1:jp+1,-1:kp+1) :: uvw
@@ -112,6 +121,9 @@ contains
         integer(8) :: dy1_buf
         integer(8) :: dzn_buf
         integer(8) :: z2_buf
+        integer(8) :: p_halo_buf
+        integer(8) :: uvw_halo_buf
+        integer(8) :: fgh_halo_buf
         integer(8) :: uvw_buf
         integer(8) :: uvwsum_buf
         integer(8) :: fgh_buf
@@ -141,6 +153,9 @@ contains
         integer, dimension(1):: dy1_sz
         integer, dimension(1):: dzn_sz
         integer, dimension(1):: z2_sz
+        integer, dimension(1):: p_halo_sz
+        integer, dimension(1):: uvw_halo_sz
+        integer, dimension(1):: fgh_halo_sz
         integer, dimension(4):: uvw_sz
         integer, dimension(4):: uvwsum_sz
         integer, dimension(4):: fgh_sz
@@ -200,6 +215,9 @@ contains
         dy1_sz = shape(dy1)
         dzn_sz = shape(dzn)
         z2_sz = shape(z2)
+        p_halo_sz = shape(p_halo)
+        uvw_halo_sz = shape(uvw_halo)
+        fgh_halo_sz = shape(fgh_halo)
         uvw_sz = shape(uvw)
         uvwsum_sz = shape(uvwsum)
         fgh_sz = shape(fgh)
@@ -230,6 +248,9 @@ contains
         call oclMake1DFloatArrayReadBuffer(dy1_buf,dy1_sz ,dy1)
         call oclMake1DFloatArrayReadBuffer(dzn_buf,dzn_sz ,dzn)
         call oclMake1DFloatArrayReadBuffer(z2_buf,z2_sz ,z2)
+        call oclMake1DFloatArrayReadWriteBuffer(p_halo_buf,p_halo_sz ,p_halo)
+        call oclMake1DFloatArrayReadWriteBuffer(uvw_halo_buf,uvw_halo_sz ,uvw_halo)
+        call oclMake1DFloatArrayReadWriteBuffer(fgh_halo_buf,fgh_halo_sz ,fgh_halo)
         call oclMake4DFloatArrayReadWriteBuffer(uvw_buf,uvw_sz ,uvw)
         call oclMake4DFloatArrayReadWriteBuffer(uvwsum_buf,uvwsum_sz ,uvwsum)
         call oclMake4DFloatArrayReadWriteBuffer(fgh_buf,fgh_sz ,fgh)
@@ -272,6 +293,9 @@ contains
         call oclSetFloatArrayArg(25, chunks_denom_buf )
         call oclSetIntArrayArg(26, n_ptr_buf )
         call oclSetIntArrayArg(27, state_ptr_buf )
+        call oclSetFloatArrayArg(32, p_halo_buf )
+        call oclSetFloatArrayArg(33, uvw_halo_buf )
+        call oclSetFloatArrayArg(34, fgh_halo_buf )
         call oclSetFloatConstArg(28, dt )
         call oclSetIntConstArg(29, im )
         call oclSetIntConstArg(30, jm )
@@ -302,6 +326,9 @@ contains
         call oclWrite1DFloatArrayBuffer(dy1_buf,dy1_sz,dy1)
         call oclWrite1DFloatArrayBuffer(dzn_buf,dzn_sz,dzn)
         call oclWrite1DFloatArrayBuffer(z2_buf,z2_sz,z2)
+        call oclWrite1DFloatArrayBuffer(p_halo_buf,p_halo_sz,p_halo)
+        call oclWrite1DFloatArrayBuffer(uvw_halo_buf,uvw_halo_sz,uvw_halo)
+        call oclWrite1DFloatArrayBuffer(fgh_halo_buf,fgh_halo_sz,fgh_halo)
         call oclWrite4DFloatArrayBuffer(uvw_buf,uvw_sz,uvw)
         call oclWrite4DFloatArrayBuffer(uvwsum_buf,uvwsum_sz,uvwsum)
         call oclWrite4DFloatArrayBuffer(fgh_buf,fgh_sz,fgh)
@@ -315,10 +342,13 @@ contains
         call oclWrite1DIntArrayBuffer(n_ptr_buf,n_ptr_sz,n_ptr)
         call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz,state_ptr)
         
-        ! call LES_combined(p_scratch, uvw, uvwsum, fgh, fgh_old,             rhs, mask1, diu, sm,            dxs, dys, dzs, dx1, dy1, dzn,             z2,             cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,            val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km             )
+        ! call LES_combined(p_scratch, uvw, uvwsum, fgh, fgh_old,             rhs, mask1, diu, sm,            dxs, dys, dzs, dx1, dy1, dzn,             z2,             cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,            val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km             , p_halo, uvw_halo, fgh_halo             )
         call runOcl(initialise_LES_kernel_globalrange,initialise_LES_kernel_localrange,initialise_LES_kernel_exectime)
         
         ! Read back Read and ReadWrite arrays
+        call oclRead1DFloatArrayBuffer(p_halo_buf,p_halo_sz,p_halo)
+        call oclRead1DFloatArrayBuffer(uvw_halo_buf,uvw_halo_sz,uvw_halo)
+        call oclRead1DFloatArrayBuffer(fgh_halo_buf,fgh_halo_sz,fgh_halo)
         call oclRead4DFloatArrayBuffer(uvw_buf,uvw_sz,uvw)
         call oclRead4DFloatArrayBuffer(uvwsum_buf,uvwsum_sz,uvwsum)
         call oclRead4DFloatArrayBuffer(fgh_buf,fgh_sz,fgh)
