@@ -169,6 +169,9 @@ contains
 #ifdef EXTERNAL_WIND_PROFILE
         oclBuffers(11) = wind_profile_buf ! BONDV1
 #endif
+        oclBuffers(12) = p_halo_buf ! HALO 
+        oclBuffers(13) = uvw_halo_buf ! HALO 
+        oclBuffers(14) = fgh_halo_buf ! HALO 
         oclNunits = initialise_LES_kernel_nunits
         oclNthreadsHint = initialise_LES_kernel_nthreads
 
@@ -251,6 +254,18 @@ contains
         integer, dimension(256) :: n_ptr
         integer, dimension(256) :: state_ptr
         
+        ! Halos
+        ! Putting the size expressions directly in the arrays crash the combined script
+        ! Probably the * symbol
+        integer, parameter :: s_p = 8 * (ip+4) * (kp+2)
+        integer, parameter :: s_uvw = 8 * (ip+3) * (kp+3) 
+        integer, parameter :: s_fgh = 8 * (ip+2) * (kp+1) 
+        real(kind=4), dimension(s_p) :: p_halo
+        real(kind=4), dimension(s_uvw) :: uvw_halo
+        real(kind=4), dimension(s_fgh) :: fgh_halo
+        
+        integer(8) :: p_halo_buf, uvw_halo_buf, fgh_halo_buf
+        integer, dimension(1) :: p_halo_sz, uvw_halo_sz, fgh_halo_sz
         
         integer(8) :: p_buf
         integer(8) :: uvw_buf
@@ -322,6 +337,9 @@ contains
 #ifdef EXTERNAL_WIND_PROFILE
         wind_profile_buf = oclBuffers(11)  ! BONDV1
 #endif
+        p_halo_buf = oclBuffers(12) ! HALO 
+        uvw_halo_buf = oclBuffers(13) ! HALO 
+        fgh_halo_buf = oclBuffers(14) ! HALO
 
         p_sz = shape(po)
         uvw_sz = shape(uvw)
@@ -336,6 +354,9 @@ contains
 #ifdef EXTERNAL_WIND_PROFILE
         wind_profile_sz = shape(wind_profile)  ! BONDV1
 #endif
+        p_halo_sz = shape(p_halo)
+        uvw_halo_sz = shape(uvw_halo)
+        fgh_halo_sz = shape(fgh_halo)
 
         n_ptr(1)=n
 #ifdef TIMINGS

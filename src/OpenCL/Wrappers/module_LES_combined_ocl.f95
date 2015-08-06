@@ -372,6 +372,9 @@ contains
         oclBuffers(8) = chunks_denom_buf ! RHSAV, PAV
         oclBuffers(9) = n_ptr_buf ! BONDV1, SOR
         oclBuffers(10) = state_ptr_buf ! ALL
+        oclBuffers(12) = p_halo_buf ! HALO
+        oclBuffers(13) = uvw_halo_buf ! HALO
+        oclBuffers(14) = fgh_halo_buf ! HALO
         oclNunits = initialise_LES_kernel_nunits
         oclNthreadsHint = initialise_LES_kernel_nthreads
     end subroutine initialise_LES_kernel
@@ -428,6 +431,17 @@ contains
         real(kind=4), dimension(512) :: chunks_num, chunks_denom
         integer, dimension(256) :: n_ptr
         integer, dimension(256) :: state_ptr
+        ! Halos
+        ! Putting the size expressions directly in the arrays crash the combined script
+        ! Probably the * symbol
+        integer, parameter :: s_p = 8 * (ip+4) * (kp+2)
+        integer, parameter :: s_uvw = 8 * (ip+3) * (kp+3)
+        integer, parameter :: s_fgh = 8 * (ip+2) * (kp+1)
+        real(kind=4), dimension(s_p) :: p_halo
+        real(kind=4), dimension(s_uvw) :: uvw_halo
+        real(kind=4), dimension(s_fgh) :: fgh_halo
+        integer(8) :: p_halo_buf, uvw_halo_buf, fgh_halo_buf
+        integer, dimension(1) :: p_halo_sz, uvw_halo_sz, fgh_halo_sz
         integer(8) :: p_buf
         integer(8) :: uvw_buf
         integer(8) :: uvwsum_buf
@@ -462,6 +476,9 @@ contains
         chunks_denom_buf = oclBuffers(8) ! RHSAV, PAV
         n_ptr_buf = oclBuffers(9) ! BONDV1, SOR
         state_ptr_buf = oclBuffers(10) ! ALL
+        p_halo_buf = oclBuffers(12) ! HALO
+        uvw_halo_buf = oclBuffers(13) ! HALO
+        fgh_halo_buf = oclBuffers(14) ! HALO
         p_sz = shape(po)
         uvw_sz = shape(uvw)
         uvwsum_sz = shape(uvwsum)
@@ -472,6 +489,9 @@ contains
         chunks_denom_sz = shape(chunks_denom)
         n_ptr_sz = shape(n_ptr)
         state_ptr_sz = shape(state_ptr)
+        p_halo_sz = shape(p_halo)
+        uvw_halo_sz = shape(uvw_halo)
+        fgh_halo_sz = shape(fgh_halo)
         n_ptr(1)=n
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
