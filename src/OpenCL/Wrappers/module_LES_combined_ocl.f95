@@ -71,6 +71,10 @@ contains
         ! Halos
         ! Putting the size expressions directly in the arrays crash the combined script
         ! Probably the * symbol
+        ! Memory layout for a (v_dim, i, j, k) array, the 4D array is flattened in 1D
+        ! First along i, then along j, then k, then v_dim
+        ! A (2,4,4,2) array would result in
+        ! (1,1,1,1)|(1,2,1,1)!(1,3,1,1)|(1,4,1,1)|(1,1,2,1)|...|(1,4,2,1)|...|(1,4,4,1)|(1,1,1,2)|...|(1,4,4,2)|(2,1,1,1)|...|(2,4,4,2)
         integer, parameter :: s_p = 8 * (ip+4) * (kp+2)
         integer, parameter :: s_uvw = 16 * (ip+3) * (kp+3)
         integer, parameter :: s_uvwsum = 16 * (ip+2) * (kp+1)

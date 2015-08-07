@@ -116,7 +116,6 @@ envF['STATUS'] = status
 if with_ocl == '0':
     FFLAGS += ['-cpp','-Ofast', '-m64', '-Wall','-ffree-form', '-fconvert=big-endian', VERBOSE,TIMINGS]
 
-OclBuilder.mcModel = 'l'
 if OclBuilder.mcModel == 'm':    
   FFLAGS += ['-mcmodel=medium']
 elif OclBuilder.mcModel == 'l':    
