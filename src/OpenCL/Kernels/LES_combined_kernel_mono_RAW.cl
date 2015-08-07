@@ -277,7 +277,11 @@ __kernel void LES_combined_kernel (
   const unsigned int km,
                 __global float *p_halo,
                 __global float *uvw_halo,
-                __global float *fgh_halo
+                __global float *uvwsum_halo,
+                __global float *fgh_halo,
+                __global float *fgh_old_halo,
+                __global float *diu_halo,
+                __global float *mask1_halo
         ) {
  unsigned int gl_id = get_global_id(0);
  unsigned int gr_id = get_group_id(0);

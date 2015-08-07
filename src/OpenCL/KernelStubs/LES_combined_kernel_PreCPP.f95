@@ -10,7 +10,7 @@ contains
 #endif
         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s, &
         val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km &
-        , p_halo, uvw_halo, fgh_halo &
+        , p_halo, uvw_halo, uvwsum_halo, fgh_halo, fgh_old_halo, diu_halo, mask1_halo &
         )
 
       use common_sn
@@ -56,11 +56,19 @@ contains
         ! Putting the size expressions directly in the arrays crash the combined script
         ! Probably the * symbol
         integer, parameter :: s_p = 8 * (ip+4) * (kp+2)
-        integer, parameter :: s_uvw = 8 * (ip+3) * (kp+3) 
-        integer, parameter :: s_fgh = 8 * (ip+2) * (kp+1) 
+        integer, parameter :: s_uvw = 16 * (ip+3) * (kp+3)
+        integer, parameter :: s_uvwsum = 16 * (ip+2) * (kp+1)
+        integer, parameter :: s_fgh = 16 * (ip+2) * (kp+1)
+        integer, parameter :: s_fgh_old = 16 * (ip+1) * kp 
+        integer, parameter :: s_diu = 64 * (ip+5) * (kp+3) 
+        integer, parameter :: s_mask1 = 16 * (ip+4) * (kp+2) 
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
+        real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
         real(kind=4), dimension(s_fgh) :: fgh_halo
+        real(kind=4), dimension(s_fgh_old) :: fgh_old_halo
+        real(kind=4), dimension(s_diu) :: diu_halo
+        real(kind=4), dimension(s_mask1) :: mask1_halo
         
 !
 end module module_LES_combined_kernel
