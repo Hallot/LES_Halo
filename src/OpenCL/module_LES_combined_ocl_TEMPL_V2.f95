@@ -441,21 +441,13 @@ contains
 
                     call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                    call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
                     
                     
                     
@@ -480,23 +472,11 @@ contains
 #error "Value for KERNEL not supported!"
 #endif
 
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
                     
                     
 #ifdef TIMINGS
@@ -527,23 +507,19 @@ contains
                     call oclWrite1DFloatArrayBuffer(val_ptr_buf,val_ptr_sz, val_ptr)
 #endif
 
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
                     call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
                     call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
                     call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
+                    call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
+                    call oclRead1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
                     
                     
 #ifdef TIMINGS
@@ -564,23 +540,19 @@ contains
                     oclLocalRange=0
                     
                     
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
                     call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
                     call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
                     call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
+                    call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
+                    call oclRead1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
                     
                     
 #ifdef TIMINGS
@@ -604,23 +576,13 @@ contains
 #endif
                     
                     
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
-                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
                     call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
+                    call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
                     
                     
 #ifdef TIMINGS
@@ -635,23 +597,15 @@ contains
                     oclGlobalRange=ip*jp*kp
                     oclLocalRange=0
 
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
-                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
                     call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
+                    call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
                     
                     
 #ifdef TIMINGS
@@ -682,23 +636,13 @@ contains
 #endif
 
 
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
-                    call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
+                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
                     
                     
 #ifdef TIMINGS
@@ -790,21 +734,11 @@ contains
                                 
                                 call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
                                 call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
-                                call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
-                                call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                                call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
-                                call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
-                                call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                                 call runOcl(oclGlobalRange,oclLocalRange,exectime)
                                 
-                                call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                                call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                                call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                                call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                                call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                                call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                                call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                                call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
+                                call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
                                 
                                 
 #ifdef TIMINGS
@@ -855,22 +789,10 @@ contains
 #endif
 
                         call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
-                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
-                        call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
-                        call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
-                        call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
                         
-                        call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                        call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                        call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                        call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                        call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
                         
                         
 #ifdef TIMINGS
@@ -897,22 +819,10 @@ contains
                         oclLocalRange=0
 
                         call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
-                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
-                        call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
-                        call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
-                        call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
                         
-                        call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                        call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                        call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                        call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                        call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
                         
                         
 #ifdef TIMINGS
@@ -938,22 +848,10 @@ contains
                         
                         
                         call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
-                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
-                        call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_write_sz, uvwsum_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_write_sz, fgh_old_halo)
-                        call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_write_sz, diu_halo)
-                        call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_write_sz, mask1_halo)
 
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
                         
-                        call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
-                        call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
-                        call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_read_sz, uvwsum_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
-                        call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_read_sz, fgh_old_halo)
-                        call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_read_sz, diu_halo)
-                        call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_read_sz, mask1_halo)
+                        call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
                         
                         
 #ifdef TIMINGS
