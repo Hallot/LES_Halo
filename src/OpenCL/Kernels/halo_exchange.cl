@@ -10,10 +10,11 @@ void exchange_2_halo_write(
     const unsigned int v_dim = 2;
     const unsigned int buf_sz = v_dim * 4 * (im+1) * km;
     const unsigned int v_limit = buf_sz / v_dim;
-    const unsigned int tp_bound = (buf_sz / 4 * v_dim) + 2;
-    const unsigned int bl_bound = (buf_sz / 2 * v_dim) + 3;
-    const unsigned int lr_bound = (3 * buf_sz / 4 * v_dim) + 2;
-    const unsigned int i;
+    const unsigned int tp_bound = (buf_sz / (4 * v_dim)) + 2;
+    const unsigned int bl_bound = (buf_sz / (2 * v_dim)) + 3;
+    const unsigned int lr_bound = (3 * buf_sz / (4 * v_dim)) + 2;
+    unsigned int i, i_off;
+    
     // Iterate along buffer
     for (i = 0; i < buf_sz; i++) {
         // Which vector component, ie along v_dim
@@ -30,31 +31,32 @@ void exchange_2_halo_write(
             }
             // left halo
             if (i >= bl_bound && i < lr_bound) {
-                array.s0[2*im*((i-bl_bound)/(jm-2)) * ((i-bl_bound)+1)*im] = buffer[i];
+                array.s0[2*im*((i-bl_bound)/(jm-2)) + ((i-bl_bound)+1)*im] = buffer[i];
             }
             // right halo
             if (i >= lr_bound) {
-                array.s0[2*im*((i-lr_bound)/(jm-2)) * ((i-lr_bound)+1)*im + (im-1)] = buffer[i];
+                array.s0[2*im*((i-lr_bound)/(jm-2)) + ((i-lr_bound)+1)*im + (im-1)] = buffer[i];
             }
         }
-        else if (i > v_limit) {
+        else if (i >= v_limit) {
+            i_off = i - v_limit;
             // top halo
-            if (i < tp_bound) {
+            if (i_off < tp_bound) {
                 // Can't simplfify im because it relies on integer division!
-                array.s1[(i%im) + (i/im)*(im*jm)] = buffer[i];
+                array.s1[(i_off%im) + (i_off/im)*(im*jm)] = buffer[i];
             }
             // bottom halo
-            if (i >= tp_bound && i < bl_bound) {
+            if (i_off >= tp_bound && i_off < bl_bound) {
                 // Can't simplfify im because it relies on integer division!
-                array.s1[((i-tp_bound)%im) + im*(jm-1) + ((i-tp_bound)/im)*(im*jm)] = buffer[i];
+                array.s1[((i_off-tp_bound)%im) + im*(jm-1) + ((i_off-tp_bound)/im)*(im*jm)] = buffer[i];
             }
             // left halo
-            if (i >= bl_bound && i < lr_bound) {
-                array.s1[2*im*((i-bl_bound)/(jm-2)) * ((i-bl_bound)+1)*im] = buffer[i];
+            if (i_off >= bl_bound && i_off < lr_bound) {
+                array.s1[2*im*((i_off-bl_bound)/(jm-2)) + ((i_off-bl_bound)+1)*im] = buffer[i];
             }
             // right halo
-            if (i >= lr_bound) {
-                array.s1[2*im*((i-lr_bound)/(jm-2)) * ((i-lr_bound)+1)*im + (im-1)] = buffer[i];
+            if (i_off >= lr_bound) {
+                array.s1[2*im*((i_off-lr_bound)/(jm-2)) + ((i_off-lr_bound)+1)*im + (im-1)] = buffer[i];
             }
         }
     }
