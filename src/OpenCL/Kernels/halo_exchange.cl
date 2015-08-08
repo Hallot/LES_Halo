@@ -1,4 +1,5 @@
 // Write the recieved buffer to the array
+// Halo order in the buffer: top|bottom|left|right where top and bottom contain the corners and thus have two more points along i each
 void exchange_2_halo_write(
     __global float2 *array,
     __global float *buffer,
@@ -6,9 +7,57 @@ void exchange_2_halo_write(
     const unsigned int jm,
     const unsigned int km
     ) {
-    int v_dim = 2;
-    int i, j, k;
-    
+    const unsigned int v_dim = 2;
+    const unsigned int buf_sz = v_dim * 4 * (im+1) * km;
+    const unsigned int v_limit = buf_sz / v_dim;
+    const unsigned int tp_bound = (buf_sz / 4 * v_dim) + 2;
+    const unsigned int bl_bound = (buf_sz / 2 * v_dim) + 3;
+    const unsigned int lr_bound = (3 * buf_sz / 4 * v_dim) + 2;
+    const unsigned int i;
+    // Iterate along buffer
+    for (i = 0; i < buf_sz; i++) {
+        // Which vector component, ie along v_dim
+        if (i < v_limit) {
+            // top halo
+            if (i < tp_bound) {
+                // Can't simplfify im because it relies on integer division!
+                array.s0[(i%im) + (i/im)*(im*jm)] = buffer[i];
+            }
+            // bottom halo
+            if (i >= tp_bound && i < bl_bound) {
+                // Can't simplfify im because it relies on integer division!
+                array.s0[((i-tp_bound)%im) + im*(jm-1) + ((i-tp_bound)/im)*(im*jm)] = buffer[i];
+            }
+            // left halo
+            if (i >= bl_bound && i < lr_bound) {
+                array.s0[2*im*((i-bl_bound)/(jm-2)) * ((i-bl_bound)+1)*im] = buffer[i];
+            }
+            // right halo
+            if (i >= lr_bound) {
+                array.s0[2*im*((i-lr_bound)/(jm-2)) * ((i-lr_bound)+1)*im + (im-1)] = buffer[i];
+            }
+        }
+        else if (i > v_limit) {
+            // top halo
+            if (i < tp_bound) {
+                // Can't simplfify im because it relies on integer division!
+                array.s1[(i%im) + (i/im)*(im*jm)] = buffer[i];
+            }
+            // bottom halo
+            if (i >= tp_bound && i < bl_bound) {
+                // Can't simplfify im because it relies on integer division!
+                array.s1[((i-tp_bound)%im) + im*(jm-1) + ((i-tp_bound)/im)*(im*jm)] = buffer[i];
+            }
+            // left halo
+            if (i >= bl_bound && i < lr_bound) {
+                array.s1[2*im*((i-bl_bound)/(jm-2)) * ((i-bl_bound)+1)*im] = buffer[i];
+            }
+            // right halo
+            if (i >= lr_bound) {
+                array.s1[2*im*((i-lr_bound)/(jm-2)) * ((i-lr_bound)+1)*im + (im-1)] = buffer[i];
+            }
+        }
+    }
 }
 
 // From the array to the in buffers

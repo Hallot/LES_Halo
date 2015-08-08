@@ -97,6 +97,8 @@ contains
         ! First along i, then along j, then k, then v_dim
         ! A (2,4,4,2) array would result in
         ! (1,1,1,1)|(1,2,1,1)!(1,3,1,1)|(1,4,1,1)|(1,1,2,1)|...|(1,4,2,1)|...|(1,4,4,1)|(1,1,1,2)|...|(1,4,4,2)|(2,1,1,1)|...|(2,4,4,2)
+        ! The halos are stored in the following order:
+        ! top|bottom|left|right where top and bottom contain the corners and thus have two more points along i each
         integer, parameter :: s_p = 8 * (ip+4) * (kp+2)
         integer, parameter :: s_uvw = 16 * (ip+3) * (kp+3)
         integer, parameter :: s_uvwsum = 16 * (ip+2) * (kp+1)
