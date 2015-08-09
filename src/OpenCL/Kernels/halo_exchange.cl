@@ -27,12 +27,12 @@ void exchange_2_halo_write(
         i_off = i - (vec_off * v_limit);
         // top halo
         if (i_off < tp_bound) {
-            // Can't simplfify im because it relies on integer division!
+            // Can't simplify im because it relies on integer division!
             vector[vec_off][(i_off%im) + (i_off/im)*(im*jm)] = buffer[i];
         }
         // bottom halo
         if (i_off >= tp_bound && i_off < bl_bound) {
-            // Can't simplfify im because it relies on integer division!
+            // Can't simplify im because it relies on integer division!
             vector[vec_off][((i_off-tp_bound)%im) + im*(jm-1) + ((i_off-tp_bound)/im)*(im*jm)] = buffer[i];
         }
         // left halo
@@ -80,13 +80,17 @@ void exchange_2_halo_read(
             if (i_off%im == 0) {
                 continue;
             }
-            // Can't simplfify im because it relies on integer division!
+            // Can't simplify im because it relies on integer division!
             buffer[i_buf] = vector[vec_off][(i_off%im) + (i_off/im)*(im*jm)];
             i_buf++;
         }
         // bottom halo
         if (i_off >= tp_bound && i_off < bl_bound) {
-            // Can't simplfify im because it relies on integer division!
+            // We don't need the first and last element when reading
+            if (i_off%im == 0) {
+                continue;
+            }
+            // Can't simplify im because it relies on integer division!
             buffer[i_buf] = vector[vec_off][((i_off-tp_bound)%im) + im*(jm-1) + ((i_off-tp_bound)/im)*(im*jm)];
             i_buf++;
         }
@@ -97,10 +101,6 @@ void exchange_2_halo_read(
         }
         // right halo
         if (i_off >= lr_bound) {
-            // We don't need the first and last element when reading
-            if (i_off%im == 0) {
-                continue;
-            }
             buffer[i_buf] = vector[vec_off][2*im*((i_off-lr_bound)/(jm-2)) + ((i_off-lr_bound)+1)*im + (im-1) - 1];
             i_buf++;
         }
