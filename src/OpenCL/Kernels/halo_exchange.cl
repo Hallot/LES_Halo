@@ -8,11 +8,11 @@ void exchange_2_halo_write(
     const unsigned int km
     ) {
     const unsigned int v_dim = 2;
-    const unsigned int buf_sz = v_dim * 4 * (im+1) * km;
+    const unsigned int buf_sz = v_dim * 2 * km * (im + jm - 2);
     const unsigned int v_limit = buf_sz / v_dim;
-    const unsigned int tp_bound = (buf_sz / (4 * v_dim)) + 2;
-    const unsigned int bl_bound = (buf_sz / (2 * v_dim)) + 3;
-    const unsigned int lr_bound = (3 * buf_sz / (4 * v_dim)) + 2;
+    const unsigned int tp_bound = im * km;
+    const unsigned int bl_bound = 2 * im * km;
+    const unsigned int lr_bound = 2 * im * km + (jm - 2) * km;
     float *vector[v_dim];
     unsigned int i, i_off, vec_off;
     
@@ -46,39 +46,63 @@ void exchange_2_halo_write(
     }
 }
 
-// From the array to the in buffers
-void exchange_2_halo_out(
+// Write the data from the array into the buffer
+// Halo order in the buffer: top|bottom|left|right where top and bottom do not contain the corners and thus have the same size as left and right
+void exchange_2_halo_read(
     __global float2 *array,
-    __global float2 *t_in,
-    __global float2 *r_in,
-    __global float2 *b_in,
-    __global float2 *l_in,
+    __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km,
-    const unsigned int h_h
+    const unsigned int km
     ) {
-    int i, j, k;
-    int lcount = 0, rcount = 0;
-    //t_in and b_in are contiguous on i and j, but not on k
-    for (k = 0; k < km; k++) {
-        memcpy(t_in + k * im * h_h, array + k * im * jm, h_h * im * sizeof(*array));
-        memcpy(b_in + k * im * h_h, array + (k + 1) * im * jm - (h_h * im), h_h * im * sizeof(*array));
-        
-        // l_out and r_out are not contiguous
-        for (i = 0; i < im; i++) {
-            for (j = 0; j < jm; j++) {
-                // Left side of the array
-                if (i < h_h) {
-                    l_in[lcount] = array[k * im * jm + j * im + i];
-                    lcount++;
-                }
-                // Right side of the array
-                if (i > im - h_h - 1) {
-                    r_in[rcount] = array[k * im * jm + j * im + i];
-                    rcount++;
-                }
+    const unsigned int v_dim = 2;
+    const unsigned int buf_sz = v_dim * 2 * km * (im + jm - 2);
+    const unsigned int v_limit = buf_sz / v_dim;
+    const unsigned int tp_bound = im * km;
+    const unsigned int bl_bound = 2 * im * km;
+    const unsigned int lr_bound = 2 * im * km + (jm - 2) * km;
+    float *vector[v_dim];
+    unsigned int i, i_off, vec_off;
+    unsigned int i_buf = 0;
+    
+    vector[0] = array.s0;
+    vector[1] = array.s1;
+    
+    // Iterate along buffer
+    for (i = 0; i < buf_sz; i++) {
+        // Which vector component, ie along v_dim
+        vec_off = i / v_limit;
+        // Offset for each vector
+        i_off = i - (vec_off * v_limit);
+        // top halo
+        if (i_off < tp_bound) {
+            // We don't need the first and last element when reading
+            if (i_off%im == 0) {
+                continue;
             }
+            // Can't simplfify im because it relies on integer division!
+            buffer[i_buf] = vector[vec_off][(i_off%im) + (i_off/im)*(im*jm)];
+            i_buf++;
+        }
+        // bottom halo
+        if (i_off >= tp_bound && i_off < bl_bound) {
+            // Can't simplfify im because it relies on integer division!
+            buffer[i_buf] = vector[vec_off][((i_off-tp_bound)%im) + im*(jm-1) + ((i_off-tp_bound)/im)*(im*jm)];
+            i_buf++;
+        }
+        // left halo
+        if (i_off >= bl_bound && i_off < lr_bound) {
+            buffer[i_buf] = vector[vec_off][2*im*((i_off-bl_bound)/(jm-2)) + ((i_off-bl_bound)+1)*im + 1];
+            i_buf++;
+        }
+        // right halo
+        if (i_off >= lr_bound) {
+            // We don't need the first and last element when reading
+            if (i_off%im == 0) {
+                continue;
+            }
+            buffer[i_buf] = vector[vec_off][2*im*((i_off-lr_bound)/(jm-2)) + ((i_off-lr_bound)+1)*im + (im-1) - 1];
+            i_buf++;
         }
     }
 }
