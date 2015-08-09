@@ -76,6 +76,7 @@ CPU_KERNEL: PARALLEL AUTO "BOUNDARY RANGE"
 #include "shared_macros.h"
 #include "../calc_array_index.h"
 #include "../calc_loop_iters.h"
+#include "halo_exchange.h"
 
 // WV: TODO: I suppose I could use an enum
 // Also, this could go into a header file

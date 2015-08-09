@@ -30,6 +30,20 @@ inline int4 calc_loop_iters(int idx, int im, int jm, int km, int i_off, int j_of
     ijk.s0 = i_off + idx % im;
     return ijk;
 }
+void exchange_2_halo_write(
+    __global float2 *array,
+    __global float *buffer,
+    const unsigned int im,
+    const unsigned int jm,
+    const unsigned int km
+    );
+void exchange_2_halo_read(
+    __global float2 *array,
+    __global float *buffer,
+    const unsigned int im,
+    const unsigned int jm,
+    const unsigned int km
+    );
 void velnw__bondv1_init_uvw_kernel (
     __global float2 * p,
     __global float4 * uvw,

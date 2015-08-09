@@ -93,19 +93,38 @@ contains
         ! Halos
         ! Putting the size expressions directly in the arrays crash the combined script
         ! Probably the * symbol
-        ! Memory layout for a (v_dim, i, j, k) array, the 4D array is flattened in 1D
-        ! First along i, then along j, then k, then v_dim
-        ! A (2,4,4,2) array would result in
-        ! (1,1,1,1)|(1,2,1,1)!(1,3,1,1)|(1,4,1,1)|(1,1,2,1)|...|(1,4,2,1)|...|(1,4,4,1)|(1,1,1,2)|...|(1,4,4,2)|(2,1,1,1)|...|(2,4,4,2)
+        ! Memory layout for the write buffer for a (v_dim, i, j, k) array
+        ! First along i, then k, then v_dim
         ! The halos are stored in the following order:
         ! top|bottom|left|right where top and bottom contain the corners and thus have two more points along i each
-        integer, parameter :: s_p = 8 * (ip+4) * (kp+2)
-        integer, parameter :: s_uvw = 16 * (ip+3) * (kp+3)
-        integer, parameter :: s_uvwsum = 16 * (ip+2) * (kp+1)
-        integer, parameter :: s_fgh = 16 * (ip+2) * (kp+1)
-        integer, parameter :: s_fgh_old = 16 * (ip+1) * kp 
-        integer, parameter :: s_diu = 64 * (ip+5) * (kp+3) 
-        integer, parameter :: s_mask1 = 16 * (ip+4) * (kp+2) 
+        ! A (2,4,4,2) array would result in the following write buffer (!! is the delimitation between halos, ?? between v_dim)
+        ! (1,1,1,1)|(1,2,1,1)|(1,3,1,1)|(1,4,1,1)!(1,1,1,2)|(1,2,1,2)|(1,3,1,2)|(1,4,1,2)!! (top)
+        ! (1,1,4,1)|(1,2,4,1)|(1,3,4,1)|(1,4,4,1)!(1,1,4,2)|(1,2,4,2)|(1,3,4,2)|(1,4,4,2)!! (bottom)
+        ! (1,1,2,1)|(1,1,3,1)|(1,1,2,2)|(1,1,3,2)!! (left)
+        ! (1,4,2,1)|(1,4,3,1)|(1,4,2,2)|(1,4,3,2) (right)
+        ! ?? (new dimension along v_dim)
+        ! (2,1,1,1)|(2,2,1,1)|(2,3,1,1)|(2,4,1,1)!(2,1,1,2)|(2,2,1,2)|(2,3,1,2)|(2,4,1,2)!! (top)
+        ! ... (same as above)
+        ! (2,4,2,1)|(2,4,3,1)|(2,4,2,2)|(2,4,3,2) (right)
+        !
+        ! The read buffers are the same, expect they do not contain the corners and the left/right halo are not on the boundary of the array, but inside by 1
+        ! They use the same buffer as the write, but the memory layout is slightly different
+        ! A (2,4,4,2) array would result in the following read buffer (!! is the delimitation between halos, ?? between v_dim)
+        ! (1,2,1,1)|(1,3,1,1)|(1,2,1,2)|(1,3,1,2)!! (top)
+        ! (1,2,4,1)|(1,3,4,1)|(1,2,4,2)|(1,3,4,2)!! (bottom)
+        ! (1,2,2,1)|(1,2,3,1)|(1,2,2,2)|(1,2,3,2)!! (left)
+        ! (1,3,2,1)|(1,3,3,1)|(1,3,2,2)|(1,3,3,2) (right)
+        ! ?? (new dimension along v_dim)
+        ! (2,2,1,1)|(2,3,1,1)|(2,2,1,2)|(2,3,1,2)!! (top)
+        ! ... (same as above)
+        ! (2,3,2,1)|(2,3,3,1)|(2,3,2,2)|(2,3,3,2) (right)
+        integer, parameter :: s_p = 4 * (ip+jp+4) * (kp+2)
+        integer, parameter :: s_uvw = 8 * (ip+jp+3) * (kp+3)
+        integer, parameter :: s_uvwsum = 8 * (ip+jp) * (kp+1)
+        integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
+        integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp 
+        integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3) 
+        integer, parameter :: s_mask1 = 8 * (ip+jp+4) * (kp+2) 
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
@@ -273,15 +292,13 @@ contains
         integer, dimension(256) :: state_ptr
         
         ! Halos
-        ! Putting the size expressions directly in the arrays crash the combined script
-        ! Probably the * symbol
-        integer, parameter :: s_p = 8 * (ip+4) * (kp+2)
-        integer, parameter :: s_uvw = 16 * (ip+3) * (kp+3)
-        integer, parameter :: s_uvwsum = 16 * (ip+2) * (kp+1)
-        integer, parameter :: s_fgh = 16 * (ip+2) * (kp+1)
-        integer, parameter :: s_fgh_old = 16 * (ip+1) * kp 
-        integer, parameter :: s_diu = 64 * (ip+5) * (kp+3) 
-        integer, parameter :: s_mask1 = 16 * (ip+4) * (kp+2) 
+        integer, parameter :: s_p = 4 * (ip+jp+4) * (kp+2)
+        integer, parameter :: s_uvw = 8 * (ip+jp+3) * (kp+3)
+        integer, parameter :: s_uvwsum = 8 * (ip+jp) * (kp+1)
+        integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
+        integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp 
+        integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3) 
+        integer, parameter :: s_mask1 = 8 * (ip+jp+4) * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo

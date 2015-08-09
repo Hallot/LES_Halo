@@ -55,13 +55,13 @@ contains
         ! Halos
         ! Putting the size expressions directly in the arrays crash the combined script
         ! Probably the * symbol
-        integer, parameter :: s_p = 8 * (ip+4) * (kp+2)
-        integer, parameter :: s_uvw = 16 * (ip+3) * (kp+3)
-        integer, parameter :: s_uvwsum = 16 * (ip+2) * (kp+1)
-        integer, parameter :: s_fgh = 16 * (ip+2) * (kp+1)
-        integer, parameter :: s_fgh_old = 16 * (ip+1) * kp
-        integer, parameter :: s_diu = 64 * (ip+5) * (kp+3)
-        integer, parameter :: s_mask1 = 16 * (ip+4) * (kp+2)
+        integer, parameter :: s_p = 4 * (ip+jp+4) * (kp+2)
+        integer, parameter :: s_uvw = 8 * (ip+jp+3) * (kp+3)
+        integer, parameter :: s_uvwsum = 8 * (ip+jp) * (kp+1)
+        integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
+        integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp
+        integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3)
+        integer, parameter :: s_mask1 = 8 * (ip+jp+4) * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
