@@ -5,8 +5,8 @@ module module_press_ocl
     use module_press
       use module_bondFG
       use module_boundp
-    integer :: init_press_boundp_ocl = 0
     integer :: init_press_adj_ocl = 0
+    integer :: init_press_boundp_ocl = 0
     integer :: init_press_rhsav_ocl = 0
     integer :: init_press_sor_ocl = 0
     integer :: init_press_pav_ocl = 0
