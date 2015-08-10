@@ -55,53 +55,39 @@ void exchange_2_halo_read(
     const unsigned int km
     ) {
     const unsigned int v_dim = 2;
-    const unsigned int buf_sz = v_dim * 2 * km * (im + jm - 2);
-    const unsigned int v_limit = buf_sz / v_dim;
-    const unsigned int tp_bound = im * km;
-    const unsigned int bl_bound = 2 * im * km;
-    const unsigned int lr_bound = 2 * im * km + (jm - 2) * km;
-    float *vector[v_dim];
-    unsigned int i, i_off, vec_off;
-    unsigned int i_buf = 0;
+    unsigned int i, j, k, v, vec_off, i_buf = 0;
     
-    vector[0] = array.s0;
-    vector[1] = array.s1;
     
-    // Iterate along buffer
-    for (i = 0; i < buf_sz; i++) {
+    for (v = 0; v < v_dim; v++) {
         // Which vector component, ie along v_dim
-        vec_off = i / v_limit;
-        // Offset for each vector
-        i_off = i - (vec_off * v_limit);
+        vec_off = v * im * jm * km;
         // top halo
-        if (i_off < tp_bound) {
-            // We don't need the first and last element when reading
-            if (i_off%im == 0) {
-                continue;
+        for (k = 0; k < km; k++) {
+            for (i = 1; i < im-1; i++) {
+                *(array + vec_off + i + k*im*jm) = buffer[i_buf];
+                i_buf++;
             }
-            // Can't simplify im because it relies on integer division!
-            buffer[i_buf] = vector[vec_off][(i_off%im) + (i_off/im)*(im*jm)];
-            i_buf++;
         }
         // bottom halo
-        if (i_off >= tp_bound && i_off < bl_bound) {
-            // We don't need the first and last element when reading
-            if (i_off%im == 0) {
-                continue;
+        for (k = 0; k < km; k++) {
+            for (i = 1; i < im-1; i++) {
+                *(array + vec_off + i + im*(jm-1) + k*im*jm) = buffer[i_buf];
+                i_buf++;
             }
-            // Can't simplify im because it relies on integer division!
-            buffer[i_buf] = vector[vec_off][((i_off-tp_bound)%im) + im*(jm-1) + ((i_off-tp_bound)/im)*(im*jm)];
-            i_buf++;
         }
         // left halo
-        if (i_off >= bl_bound && i_off < lr_bound) {
-            buffer[i_buf] = vector[vec_off][2*im*((i_off-bl_bound)/(jm-2)) + ((i_off-bl_bound)+1)*im + 1];
-            i_buf++;
+        for (k = 0; k < km; k++) {
+            for (j = 1; j < jm-1; j++) {
+                *(array + vec_off + k*im*jm + j*im + 1) = buffer[i_buf];
+                i_buf++;
+            }
         }
         // right halo
-        if (i_off >= lr_bound) {
-            buffer[i_buf] = vector[vec_off][2*im*((i_off-lr_bound)/(jm-2)) + ((i_off-lr_bound)+1)*im + (im-1) - 1];
-            i_buf++;
+        for (k = 0; k < km; k++) {
+            for (j = 1; j < jm-1; j++) {
+                *(array + vec_off + k*im*jm + j*im + (im-2)) = buffer[i_buf];
+                i_buf++;
+            }
         }
     }
 }

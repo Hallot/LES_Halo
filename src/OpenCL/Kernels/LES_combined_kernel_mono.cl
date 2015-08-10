@@ -307,7 +307,7 @@ __kernel void LES_combined_kernel_mono (
             }
         case 1:
             {
-                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                exchange_2_halo_write(p2, p_halo, im, jm, km);
              velnw__bondv1_init_uvw_kernel(p2, uvw, fgh, dxs, dys, dzs, dzn,
                z2,
                n_ptr, im, jm, km,dt);
@@ -1346,40 +1346,32 @@ void exchange_2_halo_read(
     const unsigned int km
     ) {
     const unsigned int v_dim = 2;
-    const unsigned int buf_sz = v_dim * 2 * km * (im + jm - 2);
-    const unsigned int v_limit = buf_sz / v_dim;
-    const unsigned int tp_bound = im * km;
-    const unsigned int bl_bound = 2 * im * km;
-    const unsigned int lr_bound = 2 * im * km + (jm - 2) * km;
-    float *vector[v_dim];
-    unsigned int i, i_off, vec_off;
-    unsigned int i_buf = 0;
-    vector[0] = array.s0;
-    vector[1] = array.s1;
-    for (i = 0; i < buf_sz; i++) {
-        vec_off = i / v_limit;
-        i_off = i - (vec_off * v_limit);
-        if (i_off < tp_bound) {
-            if (i_off%im == 0) {
-                continue;
+    unsigned int i, j, k, v, vec_off, i_buf = 0;
+    for (v = 0; v < v_dim; v++) {
+        vec_off = v * im * jm * km;
+        for (k = 0; k < km; k++) {
+            for (i = 1; i < im-1; i++) {
+                *(array + vec_off + i + k*im*jm) = buffer[i_buf];
+                i_buf++;
             }
-            buffer[i_buf] = vector[vec_off][(i_off%im) + (i_off/im)*(im*jm)];
-            i_buf++;
         }
-        if (i_off >= tp_bound && i_off < bl_bound) {
-            if (i_off%im == 0) {
-                continue;
+        for (k = 0; k < km; k++) {
+            for (i = 1; i < im-1; i++) {
+                *(array + vec_off + i + im*(jm-1) + k*im*jm) = buffer[i_buf];
+                i_buf++;
             }
-            buffer[i_buf] = vector[vec_off][((i_off-tp_bound)%im) + im*(jm-1) + ((i_off-tp_bound)/im)*(im*jm)];
-            i_buf++;
         }
-        if (i_off >= bl_bound && i_off < lr_bound) {
-            buffer[i_buf] = vector[vec_off][2*im*((i_off-bl_bound)/(jm-2)) + ((i_off-bl_bound)+1)*im + 1];
-            i_buf++;
+        for (k = 0; k < km; k++) {
+            for (j = 1; j < jm-1; j++) {
+                *(array + vec_off + k*im*jm + j*im + 1) = buffer[i_buf];
+                i_buf++;
+            }
         }
-        if (i_off >= lr_bound) {
-            buffer[i_buf] = vector[vec_off][2*im*((i_off-lr_bound)/(jm-2)) + ((i_off-lr_bound)+1)*im + (im-1) - 1];
-            i_buf++;
+        for (k = 0; k < km; k++) {
+            for (j = 1; j < jm-1; j++) {
+                *(array + vec_off + k*im*jm + j*im + (im-2)) = buffer[i_buf];
+                i_buf++;
+            }
         }
     }
 }

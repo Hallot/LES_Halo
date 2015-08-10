@@ -194,7 +194,7 @@ __kernel void LES_combined_kernel (
             }
         case ST_VELNW__BONDV1_INIT_UVW:
             {
-                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                exchange_2_halo_write(p2, p_halo, im, jm, km);
             	velnw__bondv1_init_uvw_kernel(p2, uvw, fgh, dxs, dys, dzs, dzn,
 #ifndef EXTERNAL_WIND_PROFILE
             			z2,

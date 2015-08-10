@@ -6,11 +6,11 @@
 module module_LES_combined_ocl
     use module_LES_conversions
 ! use module_LES_tests
+    integer :: init_write_uvw_p_to_file = 0
     integer :: init_write_fgh_old_to_file = 0
+    integer :: init_write_uvw_p_uvwsum_to_file = 0
     integer :: init_initialise_LES_kernel = 0
     integer :: init_run_LES_kernel = 0
-    integer :: init_write_uvw_p_uvwsum_to_file = 0
-    integer :: init_write_uvw_p_to_file = 0
 contains
     subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         )
         use oclWrapper
