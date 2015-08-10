@@ -1309,30 +1309,29 @@ void exchange_2_halo_write(
     const unsigned int km
     ) {
     const unsigned int v_dim = 2;
-    unsigned int i, j, k, v, vec_off, i_buf = 0;
+    unsigned int i, j, k, v, i_buf = 0;
     for (v = 0; v < v_dim; v++) {
-        vec_off = v * im * jm * km;
         for (k = 0; k < km; k++) {
             for (i = 0; i < im; i++) {
-                *(array + vec_off + i + k*im*jm) = buffer[i_buf];
+                ((__global float*)&array[i + k*im*jm])[v] = buffer[i_buf];
                 i_buf++;
             }
         }
         for (k = 0; k < km; k++) {
             for (i = 0; i < im; i++) {
-                *(array + vec_off + i + im*(jm-1) + k*im*jm) = buffer[i_buf];
+                ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v] = buffer[i_buf];
                 i_buf++;
             }
         }
         for (k = 0; k < km; k++) {
             for (j = 1; j < jm-1; j++) {
-                *(array + vec_off + k*im*jm + j*im) = buffer[i_buf];
+                ((__global float*)&array[j*im + k*im*jm])[v] = buffer[i_buf];
                 i_buf++;
             }
         }
         for (k = 0; k < km; k++) {
             for (j = 1; j < jm-1; j++) {
-                *(array + vec_off + k*im*jm + j*im + (im-1)) = buffer[i_buf];
+                ((__global float*)&array[j*im + k*im*jm + (im-1)])[v] = buffer[i_buf];
                 i_buf++;
             }
         }
@@ -1345,33 +1344,4 @@ void exchange_2_halo_read(
     const unsigned int jm,
     const unsigned int km
     ) {
-    const unsigned int v_dim = 2;
-    unsigned int i, j, k, v, vec_off, i_buf = 0;
-    for (v = 0; v < v_dim; v++) {
-        vec_off = v * im * jm * km;
-        for (k = 0; k < km; k++) {
-            for (i = 1; i < im-1; i++) {
-                *(array + vec_off + i + k*im*jm) = buffer[i_buf];
-                i_buf++;
-            }
-        }
-        for (k = 0; k < km; k++) {
-            for (i = 1; i < im-1; i++) {
-                *(array + vec_off + i + im*(jm-1) + k*im*jm) = buffer[i_buf];
-                i_buf++;
-            }
-        }
-        for (k = 0; k < km; k++) {
-            for (j = 1; j < jm-1; j++) {
-                *(array + vec_off + k*im*jm + j*im + 1) = buffer[i_buf];
-                i_buf++;
-            }
-        }
-        for (k = 0; k < km; k++) {
-            for (j = 1; j < jm-1; j++) {
-                *(array + vec_off + k*im*jm + j*im + (im-2)) = buffer[i_buf];
-                i_buf++;
-            }
-        }
-    }
 }
