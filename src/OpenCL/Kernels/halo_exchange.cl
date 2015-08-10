@@ -64,28 +64,28 @@ void exchange_2_halo_read(
         // top halo
         for (k = 0; k < km; k++) {
             for (i = 1; i < im-1; i++) {
-                *(array + vec_off + i + k*im*jm) = buffer[i_buf];
+                buffer[i_buf] = *(array + vec_off + i + k*im*jm);
                 i_buf++;
             }
         }
         // bottom halo
         for (k = 0; k < km; k++) {
             for (i = 1; i < im-1; i++) {
-                *(array + vec_off + i + im*(jm-1) + k*im*jm) = buffer[i_buf];
+                buffer[i_buf] = *(array + vec_off + i + im*(jm-1) + k*im*jm);
                 i_buf++;
             }
         }
         // left halo
         for (k = 0; k < km; k++) {
             for (j = 1; j < jm-1; j++) {
-                *(array + vec_off + k*im*jm + j*im + 1) = buffer[i_buf];
+                buffer[i_buf] = *(array + vec_off + k*im*jm + j*im + 1);
                 i_buf++;
             }
         }
         // right halo
         for (k = 0; k < km; k++) {
             for (j = 1; j < jm-1; j++) {
-                *(array + vec_off + k*im*jm + j*im + (im-2)) = buffer[i_buf];
+                buffer[i_buf] = *(array + vec_off + k*im*jm + j*im + (im-2));
                 i_buf++;
             }
         }
