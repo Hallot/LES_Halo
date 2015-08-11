@@ -6,11 +6,11 @@
 module module_LES_combined_ocl
     use module_LES_conversions
 ! use module_LES_tests
-    integer :: init_write_fgh_old_to_file = 0
     integer :: init_write_uvw_p_to_file = 0
-    integer :: init_initialise_LES_kernel = 0
-    integer :: init_run_LES_kernel = 0
     integer :: init_write_uvw_p_uvwsum_to_file = 0
+    integer :: init_write_fgh_old_to_file = 0
+    integer :: init_run_LES_kernel = 0
+    integer :: init_initialise_LES_kernel = 0
 contains
     subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         )
         use oclWrapper
@@ -521,7 +521,13 @@ contains
         integer, parameter :: ST_BONDV1_CALC_UVW=3, ST_VELFG__FEEDBF__LES_CALC_SM=4, ST_LES_BOUND_SM=5, ST_LES_CALC_VISC__ADAM=6
         integer, parameter :: ST_BONDV1_CALC_UVW__VELFG__FEEDBF__LES_CALC_SM=30, ST_VELFG=31, ST_FEEDBF__LES_CALC_SM=32
         integer, parameter :: ST_PRESS_RHSAV=7, ST_PRESS_SOR=8, ST_PRESS_PAV=9, ST_PRESS_ADJ=10, ST_PRESS_BOUNDP=11, ST_DONE=12
-        integer, parameter :: ST_HALO=13
+        integer, parameter :: ST_HALO_WRITE_VELNW__BONDV1_INIT_UVW= 13, ST_HALO_READ_VELNW__BONDV1_INIT_UVW= 14, ST_HALO_WRITE_BONDV1_CALC_UOUT= 15
+        integer, parameter :: ST_HALO_READ_BONDV1_CALC_UOUT= 16, ST_HALO_WRITE_BONDV1_CALC_UVW= 17, ST_HALO_READ_BONDV1_CALC_UVW= 18
+        integer, parameter :: ST_HALO_WRITE_VELFG__FEEDBF__LES_CALC_SM= 19, ST_HALO_READ_VELFG__FEEDBF__LES_CALC_SM= 20, ST_HALO_WRITE_LES_BOUND_SM= 21
+        integer, parameter :: ST_HALO_READ_LES_BOUND_SM= 22, ST_HALO_WRITE_LES_CALC_VISC__ADAM= 23, ST_HALO_READ_LES_CALC_VISC__ADAM= 24
+        integer, parameter :: ST_HALO_WRITE_PRESS_RHSAV= 25, ST_HALO_READ_PRESS_RHSAV= 26, ST_HALO_WRITE_PRESS_SOR= 27, ST_HALO_READ_PRESS_SOR= 28
+        integer, parameter :: ST_HALO_WRITE_PRESS_PAV= 29, ST_HALO_READ_PRESS_PAV= 30, ST_HALO_WRITE_PRESS_ADJ= 33
+        integer, parameter :: ST_HALO_READ_PRESS_ADJ= 34, ST_HALO_WRITE_PRESS_BOUNDP= 35, ST_HALO_READ_PRESS_BOUNDP= 36
         real (kind=4) :: exectime
         ! 2D global range parameter
         ! first element is the dimension
@@ -598,7 +604,7 @@ contains
                     call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                    state_ptr(1)= ST_HALO
+                    state_ptr(1)= ST_HALO_WRITE_VELNW__BONDV1_INIT_UVW
                     call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
                     GlobalRange_2D = (/2,kp,MAX(ip, jp)/)
                     ! * MAX(ip, jp)

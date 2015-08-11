@@ -3,8 +3,8 @@
 module module_bondv1_ocl
     use module_LES_conversions
     use module_bondv1
-    integer :: init_bondv1_calc_uvw_ocl = 0
     integer :: init_bondv1_ocl = 0
+    integer :: init_bondv1_calc_uvw_ocl = 0
     integer :: init_bondv1_calc_uout_ocl = 0
 contains
       subroutine bondv1_ocl(jm,u,z2,dzn,v,w,km,uout,n,im,dt,dxs)
