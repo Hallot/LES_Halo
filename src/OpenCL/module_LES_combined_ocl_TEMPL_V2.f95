@@ -124,7 +124,7 @@ contains
         integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
         integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp 
         integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3) 
-        integer, parameter :: s_mask1 = 8 * (ip+jp+4) * (kp+2) 
+        integer, parameter :: s_mask1 = 8 * (ip+jp+4) * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
@@ -356,12 +356,18 @@ contains
 
         integer, parameter :: ST_PRESS_RHSAV=7, ST_PRESS_SOR=8, ST_PRESS_PAV=9, ST_PRESS_ADJ=10, ST_PRESS_BOUNDP=11, ST_DONE=12
         
+        integer, parameter :: ST_HALO=13
+        
         real (kind=4) :: exectime
 #ifdef TIMINGS
         real (kind=4) :: sor_exectime, time_start, time_stop !
         integer :: itim
         real (kind=4), dimension(0:12) :: ktimestamp
 #endif
+
+        ! 2D global range parameter
+        ! first element is the dimension
+        integer, dimension(3) :: GlobalRange_2D
         
 
 
@@ -465,6 +471,15 @@ contains
                     call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
+                    
+                    state_ptr(1)= ST_HALO
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    GlobalRange_2D = (/2,kp,MAX(ip, jp)/)
+                    ! * MAX(ip, jp)
+                    call runOcl(kp,0,exectime)
+                    
+                    state_ptr(1)=state
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     

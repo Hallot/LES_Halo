@@ -10,7 +10,7 @@ contains
 #endif
         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s, &
         val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km &
-        , p_halo, uvw_halo, uvwsum_halo, fgh_halo, fgh_old_halo, diu_halo, mask1_halo &
+        , p_halo, uvw_halo, uvwsum_halo, fgh_halo, fgh_old_halo, diu_halo, mask1_halo, local_halo &
         )
 
       use common_sn

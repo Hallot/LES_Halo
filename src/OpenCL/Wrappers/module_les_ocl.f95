@@ -5,8 +5,8 @@ module module_les_ocl
     use module_LES_conversions
     use module_les
       use module_boundsm ! add_module_decls() line 156
-        integer :: init_les_calc_visc__adam_ocl = 0
         integer :: init_les_bound_sm_ocl = 0
+        integer :: init_les_calc_visc__adam_ocl = 0
         integer :: init_les_calc_sm_ocl = 0
         integer :: init_les_calc_visc_ocl = 0
         integer :: init_merged_velfg_feedbf_les_calc_sm_ocl = 0

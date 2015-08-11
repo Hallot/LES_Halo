@@ -4,41 +4,28 @@ void exchange_2_halo_write(
     __global float2 *array,
     __global float *buffer,
     const unsigned int im,
-    const unsigned int jm,
-    const unsigned int km
-    ) {
+    const unsigned int jm
+) {
     const unsigned int v_dim = 2;
-    unsigned int i, j, k, v, i_buf = 0;
-    
+    const unsigned int k = get_global_id(0);
+    const unsigned int i = get_global_id(1);
+    const unsigned int km = get_global_size(0);
+    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+
     // Which vector component, ie along v_dim
-    for (v = 0; v < v_dim; v++) {
-        // top halo
-        for (k = 0; k < km; k++) {
-            for (i = 0; i < im; i++) {
-                ((__global float*)&array[i + k*im*jm])[v] = buffer[i_buf];
-                i_buf++;
-            }
+    for (unsigned int v = 0; v < v_dim; v++) {
+        if (i < im){
+            // top halo
+            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im];
+            // bottom halo
+            ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v] = buffer[v*v_sz + km*im + i + k*im];
         }
-        // bottom halo
-        for (k = 0; k < km; k++) {
-            for (i = 0; i < im; i++) {
-                ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v] = buffer[i_buf];
-                i_buf++;
-            }
-        }
-        // left halo
-        for (k = 0; k < km; k++) {
-            for (j = 1; j < jm-1; j++) {
-                ((__global float*)&array[j*im + k*im*jm])[v] = buffer[i_buf];
-                i_buf++;
-            }
-        }
-        // right halo
-        for (k = 0; k < km; k++) {
-            for (j = 1; j < jm-1; j++) {
-                ((__global float*)&array[j*im + k*im*jm + (im-1)])[v] = buffer[i_buf];
-                i_buf++;
-            }
+
+        if (i < jm-1 && i > 0) {
+            // left halo
+            ((__global float*)&array[i*im + k*im*jm])[v] = buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)];
+            // right halo
+            ((__global float*)&array[i*im + k*im*jm + (im-1)])[v] = buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)];
         }
     }
 }

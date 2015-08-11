@@ -95,6 +95,28 @@ CPU_KERNEL: PARALLEL AUTO "BOUNDARY RANGE"
 #define ST_PRESS_PAV 9
 #define ST_PRESS_ADJ 10
 #define ST_PRESS_BOUNDP 11
+#define ST_HALO_WRITE_VELNW__BONDV1_INIT_UVW 13
+#define ST_HALO_READ_VELNW__BONDV1_INIT_UVW 14
+#define ST_HALO_WRITE_BONDV1_CALC_UOUT 15
+#define ST_HALO_READ_BONDV1_CALC_UOUT 16
+#define ST_HALO_WRITE_BONDV1_CALC_UVW 17
+#define ST_HALO_READ_BONDV1_CALC_UVW 18
+#define ST_HALO_WRITE_VELFG__FEEDBF__LES_CALC_SM 19
+#define ST_HALO_READ_VELFG__FEEDBF__LES_CALC_SM 20
+#define ST_HALO_WRITE_LES_BOUND_SM 21
+#define ST_HALO_READ_LES_BOUND_SM 22
+#define ST_HALO_WRITE_LES_CALC_VISC__ADAM 23
+#define ST_HALO_READ_LES_CALC_VISC__ADAM 24
+#define ST_HALO_WRITE_PRESS_RHSAV 25
+#define ST_HALO_READ_PRESS_RHSAV 26
+#define ST_HALO_WRITE_PRESS_SOR 27
+#define ST_HALO_READ_PRESS_SOR 28
+#define ST_HALO_WRITE_PRESS_PAV 29
+#define ST_HALO_READ_PRESS_PAV 30
+#define ST_HALO_WRITE_PRESS_ADJ 33 
+#define ST_HALO_READ_PRESS_ADJ 34
+#define ST_HALO_WRITE_PRESS_BOUNDP 35
+#define ST_HALO_READ_PRESS_BOUNDP 36
 
 // TODO: considering that im,jm,km are always identical to ip,jp,kp which are constants,
 // I could simply define the constants using macros and remove these pesky arguments
@@ -169,11 +191,12 @@ __kernel void LES_combined_kernel (
                 __global float *fgh_halo,
                 __global float *fgh_old_halo,
                 __global float *diu_halo,
-                __global float *mask1_halo		
+                __global float *mask1_halo
         ) {
 	unsigned int gl_id = get_global_id(0);
 	unsigned int gr_id = get_group_id(0);
 	unsigned int l_id =  get_local_id(0);
+        
 
 #if KERNEL == CPU_KERNEL
 	__local float loc_th_1[NTH];
@@ -194,7 +217,6 @@ __kernel void LES_combined_kernel (
             }
         case ST_VELNW__BONDV1_INIT_UVW:
             {
-                exchange_2_halo_write(p2, p_halo, im, jm, km);
             	velnw__bondv1_init_uvw_kernel(p2, uvw, fgh, dxs, dys, dzs, dzn,
 #ifndef EXTERNAL_WIND_PROFILE
             			z2,
@@ -312,6 +334,12 @@ __kernel void LES_combined_kernel (
         case ST_PRESS_BOUNDP:
             {
                 press_boundp_kernel(p2, im, jm, km);
+                break;
+            }
+        case ST_HALO_WRITE_VELNW__BONDV1_INIT_UVW:
+            {
+                exchange_2_halo_write(p2, p_halo, im, jm);
+                exchange_2_halo_write(diu, diu_halo, im, jm);
                 break;
             }
         default:    
