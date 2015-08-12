@@ -370,10 +370,6 @@ contains
         integer :: itim
         real (kind=4), dimension(0:12) :: ktimestamp
 #endif
-
-        ! 2D global range parameter
-        ! first element is the dimension
-        integer, dimension(3) :: GlobalRange_2D
         
 
 
@@ -478,16 +474,22 @@ contains
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
                     
+                    state_ptr(1)= ST_HALO_READ_VELNW__BONDV1_INIT_UVW
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl(kp * MAX(ip, jp),0,exectime)
+                    
                     state_ptr(1)= ST_HALO_WRITE_VELNW__BONDV1_INIT_UVW
                     call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
-                    GlobalRange_2D = (/2,kp,MAX(ip, jp)/)
-                    ! * MAX(ip, jp)
-                    call runOcl(kp,0,exectime)
+                    call runOcl(kp * MAX(ip, jp),0,exectime)
                     
                     state_ptr(1)=state
                     call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    state_ptr(1)= ST_HALO_READ_VELNW__BONDV1_INIT_UVW
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl(kp * MAX(ip, jp),0,exectime)
                     
                     call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
                     call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)

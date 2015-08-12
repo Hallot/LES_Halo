@@ -8,8 +8,9 @@ void exchange_2_halo_write(
     const unsigned int km
 ) {
     const unsigned int v_dim = 2;
-    const unsigned int k = get_global_id(0);
-    const unsigned int i = get_global_id(1);
+    const unsigned int gl_id = get_global_id(0);
+    const unsigned int k = gl_id % km;
+    const unsigned int i = gl_id / km;
     const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
 
     // Which vector component, ie along v_dim
@@ -38,41 +39,26 @@ void exchange_2_halo_read(
     const unsigned int im,
     const unsigned int jm,
     const unsigned int km
-    ) {/*
-    const unsigned int v_dim = 2;
-    unsigned int i, j, k, v, vec_off, i_buf = 0;
-    
-    
-    for (v = 0; v < v_dim; v++) {
-        // Which vector component, ie along v_dim
-        vec_off = v * im * jm * km;
-        // top halo
-        for (k = 0; k < km; k++) {
-            for (i = 1; i < im-1; i++) {
-                buffer[i_buf] = ((__global float*)&array[i + k*im*jm])[v];
-                i_buf++;
-            }
+    ) {const unsigned int v_dim = 2;
+    const unsigned int gl_id = get_global_id(0);
+    const unsigned int k = gl_id % km;
+    const unsigned int i = gl_id / km;
+    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+
+    // Which vector component, ie along v_dim
+    for (unsigned int v = 0; v < v_dim; v++) {
+        if (i < im && k < km){
+            // top halo
+            buffer[v*v_sz + i + k*im] = ((__global float*)&array[i + k*im*jm])[v];
+            // bottom halo
+            buffer[v*v_sz + km*im + i + k*im] = ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v];
         }
-        // bottom halo
-        for (k = 0; k < km; k++) {
-            for (i = 1; i < im-1; i++) {
-                buffer[i_buf] = ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v];
-                i_buf++;
-            }
+
+        if (i < jm-1 && k < km && i > 0) {
+            // left halo
+            buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm])[v];
+            // right halo
+            buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm + (im-1)])[v];
         }
-        // left halo
-        for (k = 0; k < km; k++) {
-            for (j = 1; j < jm-1; j++) {
-                buffer[i_buf] = ((__global float*)&array[j*im + k*im*jm + 1])[v];
-                i_buf++;
-            }
-        }
-        // right halo
-        for (k = 0; k < km; k++) {
-            for (j = 1; j < jm-1; j++) {
-                buffer[i_buf] = ((__global float*)&array[j*im + k*im*jm + (im-2)])[v];
-                i_buf++;
-            }
-        }
-    }*/
+    }
 }

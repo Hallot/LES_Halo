@@ -396,8 +396,12 @@ __kernel void LES_combined_kernel_mono (
             }
         case 13:
             {
-                exchange_2_halo_write(p2, p_halo, im, jm, km);
                 exchange_2_halo_write(diu, diu_halo, im, jm, km);
+                break;
+            }
+        case 14:
+            {
+                exchange_2_halo_read(diu, diu_halo, im, jm, km);
                 break;
             }
         default:
@@ -1314,8 +1318,9 @@ void exchange_2_halo_write(
     const unsigned int km
 ) {
     const unsigned int v_dim = 2;
-    const unsigned int k = get_global_id(0);
-    const unsigned int i = get_global_id(1);
+    const unsigned int gl_id = get_global_id(0);
+    const unsigned int k = gl_id % km;
+    const unsigned int i = gl_id / km;
     const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
     for (unsigned int v = 0; v < v_dim; v++) {
         if (i < im && k < km){
@@ -1334,5 +1339,19 @@ void exchange_2_halo_read(
     const unsigned int im,
     const unsigned int jm,
     const unsigned int km
-    ) {
+    ) {const unsigned int v_dim = 2;
+    const unsigned int gl_id = get_global_id(0);
+    const unsigned int k = gl_id % km;
+    const unsigned int i = gl_id / km;
+    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    for (unsigned int v = 0; v < v_dim; v++) {
+        if (i < im && k < km){
+            buffer[v*v_sz + i + k*im] = ((__global float*)&array[i + k*im*jm])[v];
+            buffer[v*v_sz + km*im + i + k*im] = ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v];
+        }
+        if (i < jm-1 && k < km && i > 0) {
+            buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm])[v];
+            buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm + (im-1)])[v];
+        }
+    }
 }

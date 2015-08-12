@@ -338,8 +338,14 @@ __kernel void LES_combined_kernel (
             }
         case ST_HALO_WRITE_VELNW__BONDV1_INIT_UVW:
             {
-                exchange_2_halo_write(p2, p_halo, im, jm, km);
+                //exchange_2_halo_write(p2, p_halo, im, jm, km);
                 exchange_2_halo_write(diu, diu_halo, im, jm, km);
+                break;
+            }
+        case ST_HALO_READ_VELNW__BONDV1_INIT_UVW:
+            {
+                //exchange_2_halo_read(p2, p_halo, im, jm, km);
+                exchange_2_halo_read(diu, diu_halo, im, jm, km);
                 break;
             }
         default:    
