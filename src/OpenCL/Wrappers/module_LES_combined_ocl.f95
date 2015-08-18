@@ -6,11 +6,11 @@
 module module_LES_combined_ocl
     use module_LES_conversions
 ! use module_LES_tests
-    integer :: init_write_uvw_p_to_file = 0
-    integer :: init_write_fgh_old_to_file = 0
-    integer :: init_run_LES_kernel = 0
-    integer :: init_initialise_LES_kernel = 0
     integer :: init_write_uvw_p_uvwsum_to_file = 0
+    integer :: init_run_LES_kernel = 0
+    integer :: init_write_fgh_old_to_file = 0
+    integer :: init_write_uvw_p_to_file = 0
+    integer :: init_initialise_LES_kernel = 0
 contains
     subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         )
         use oclWrapper
@@ -528,6 +528,7 @@ contains
         integer, parameter :: ST_HALO_WRITE_PRESS_RHSAV= 25, ST_HALO_READ_PRESS_RHSAV= 26, ST_HALO_WRITE_PRESS_SOR= 27, ST_HALO_READ_PRESS_SOR= 28
         integer, parameter :: ST_HALO_WRITE_PRESS_PAV= 29, ST_HALO_READ_PRESS_PAV= 30, ST_HALO_WRITE_PRESS_ADJ= 33
         integer, parameter :: ST_HALO_READ_PRESS_ADJ= 34, ST_HALO_WRITE_PRESS_BOUNDP= 35, ST_HALO_READ_PRESS_BOUNDP= 36
+        integer, parameter :: ST_HALO_READ_ALL= 40, ST_HALO_WRITE_ALL= 41
         real (kind=4) :: exectime
         foldo=0
         goldo=0
@@ -588,6 +589,10 @@ contains
         mask1_halo = 7.0
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
+        ! Read everything in the halo buffers to test things
+        !state_ptr(1)= ST_HALO_READ_ALL
+        !call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+        !call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
         ! 2. Run the time/state nested loops, copying only time and state
         do state = ST_VELNW__BONDV1_INIT_UVW, ST_PRESS_BOUNDP
             state_ptr(1)=state
@@ -601,18 +606,18 @@ contains
                     call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_write_sz, p_halo)
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_write_sz, uvw_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_write_sz, fgh_halo)
-                    state_ptr(1)= ST_HALO_READ_VELNW__BONDV1_INIT_UVW
+                    state_ptr(1)= ST_HALO_READ_ALL
                     call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
-                    call runOcl(kp * MAX(ip, jp),0,exectime)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                     state_ptr(1)= ST_HALO_WRITE_VELNW__BONDV1_INIT_UVW
                     call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
-                    call runOcl(kp * MAX(ip, jp),0,exectime)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                     state_ptr(1)=state
                     call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     state_ptr(1)= ST_HALO_READ_VELNW__BONDV1_INIT_UVW
                     call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
-                    call runOcl(kp * MAX(ip, jp),0,exectime)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                     call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_read_sz, p_halo)
                     call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_read_sz, uvw_halo)
                     call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_read_sz, fgh_halo)
