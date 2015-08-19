@@ -557,6 +557,36 @@ __kernel void LES_combined_kernel_mono (
                 exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
                 break;
             }
+        case 29:
+            {
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case 33:
+            {
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case 34:
+            {
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case 35:
+            {
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case 36:
+            {
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case 37:
+            {
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
         default:
             n=1;
     };

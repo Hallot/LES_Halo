@@ -6,11 +6,11 @@
 module module_LES_combined_ocl
     use module_LES_conversions
 ! use module_LES_tests
-    integer :: init_write_uvw_p_to_file = 0
-    integer :: init_write_uvw_p_uvwsum_to_file = 0
-    integer :: init_write_fgh_old_to_file = 0
-    integer :: init_run_LES_kernel = 0
     integer :: init_initialise_LES_kernel = 0
+    integer :: init_write_uvw_p_uvwsum_to_file = 0
+    integer :: init_write_uvw_p_to_file = 0
+    integer :: init_run_LES_kernel = 0
+    integer :: init_write_fgh_old_to_file = 0
 contains
     subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         )
         use oclWrapper
@@ -782,7 +782,15 @@ contains
                         oclLocalRange = ip
                         ngroups = kp
                         call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        state_ptr(1)= ST_HALO_WRITE_PRESS_PAV
+                        call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                        call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                        state_ptr(1)=state
+                        call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        state_ptr(1)= ST_HALO_READ_PRESS_PAV
+                        call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                        call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                         call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
                         call oclRead1DFloatArrayBuffer(chunks_num_buf,chunks_num_sz,chunks_num)
                         call oclRead1DFloatArrayBuffer(chunks_denom_buf,chunks_denom_sz, chunks_denom)
@@ -800,7 +808,15 @@ contains
                         oclGlobalRange=ip*jp*kp
                         oclLocalRange=0
                         call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        state_ptr(1)= ST_HALO_WRITE_PRESS_ADJ
+                        call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                        call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                        state_ptr(1)=state
+                        call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        state_ptr(1)= ST_HALO_READ_PRESS_ADJ
+                        call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                        call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                         call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                     case (ST_PRESS_BOUNDP)
@@ -808,7 +824,15 @@ contains
                         oclGlobalRange = max_range*max_range
                         oclLocalRange = max_range
                         call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+                        state_ptr(1)= ST_HALO_WRITE_PRESS_BOUNDP
+                        call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                        call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                        state_ptr(1)=state
+                        call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
                         call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                        state_ptr(1)= ST_HALO_READ_PRESS_BOUNDP
+                        call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                        call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                         call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
                         !
                         if ((mod(n,1000) == 0 .or. n == nmax)) then
