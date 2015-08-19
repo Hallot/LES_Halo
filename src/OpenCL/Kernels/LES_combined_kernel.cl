@@ -387,7 +387,45 @@ __kernel void LES_combined_kernel (
             {
                 exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3);
                 break;
-            }    
+            } 
+        case ST_HALO_WRITE_BONDV1_CALC_UVW:
+            {
+                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3);
+                break;
+            }
+        case ST_HALO_READ_BONDV1_CALC_UVW:
+            {
+                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3);
+                break;
+            } 
+        case ST_HALO_WRITE_VELFG__FEEDBF__LES_CALC_SM:
+            {
+                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3);
+                exchange_4_halo_write(uvwsum, uvwsum_halo, im+1, jm+1, km+1);
+                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
+                exchange_16_halo_write(diu, diu_halo, im+4, jm+3, km+3);
+                exchange_1_halo_write(sm, sm_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case ST_HALO_READ_VELFG__FEEDBF__LES_CALC_SM:
+            {
+                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3);
+                exchange_4_halo_read(uvwsum, uvwsum_halo, im+1, jm+1, km+1);
+                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
+                exchange_16_halo_read(diu, diu_halo, im+4, jm+3, km+3);
+                exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case ST_HALO_WRITE_LES_BOUND_SM:
+            {
+                exchange_1_halo_write(sm, sm_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case ST_HALO_READ_LES_BOUND_SM:
+            {
+                exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2);
+                break;
+            }
         default:    
             n=1;
             // do nothing

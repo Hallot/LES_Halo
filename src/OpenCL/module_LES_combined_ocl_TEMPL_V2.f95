@@ -556,16 +556,21 @@ contains
 #endif
 
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
+                    
+                    state_ptr(1)= ST_HALO_WRITE_BONDV1_CALC_UVW
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    
+                    state_ptr(1)=state
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
+                    state_ptr(1)= ST_HALO_READ_BONDV1_CALC_UVW
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    
                     call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
-                    call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
-                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
-                    call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
                     
                     
 #ifdef TIMINGS
@@ -590,13 +595,26 @@ contains
                     call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
+                    call oclWrite1DFloatArrayBuffer(sm_halo_buf, sm_halo_sz, sm_halo)
+
+                    state_ptr(1)= ST_HALO_WRITE_VELFG__FEEDBF__LES_CALC_SM
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    
+                    state_ptr(1)=state
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    state_ptr(1)= ST_HALO_READ_VELFG__FEEDBF__LES_CALC_SM
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                     
                     call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
                     call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
+                    call oclRead1DFloatArrayBuffer(sm_halo_buf, sm_halo_sz, sm_halo)
                     
                     
 #ifdef TIMINGS

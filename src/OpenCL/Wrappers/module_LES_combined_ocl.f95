@@ -6,11 +6,11 @@
 module module_LES_combined_ocl
     use module_LES_conversions
 ! use module_LES_tests
-    integer :: init_write_fgh_old_to_file = 0
-    integer :: init_write_uvw_p_uvwsum_to_file = 0
-    integer :: init_write_uvw_p_to_file = 0
-    integer :: init_run_LES_kernel = 0
     integer :: init_initialise_LES_kernel = 0
+    integer :: init_write_uvw_p_uvwsum_to_file = 0
+    integer :: init_write_fgh_old_to_file = 0
+    integer :: init_run_LES_kernel = 0
+    integer :: init_write_uvw_p_to_file = 0
 contains
     subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         )
         use oclWrapper
@@ -633,14 +633,16 @@ contains
                     oclGlobalRange=(kp*jp)+(kp+2)*(ip+2)+(ip+3)*(jp+3)
                     oclLocalRange=0
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
-                    call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
-                    call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
+                    state_ptr(1)= ST_HALO_WRITE_BONDV1_CALC_UVW
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    state_ptr(1)=state
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    state_ptr(1)= ST_HALO_READ_BONDV1_CALC_UVW
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                     call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
-                    call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
-                    call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
-                    call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                 case (ST_VELFG__FEEDBF__LES_CALC_SM)
 !#define NEW_VELFG
@@ -650,11 +652,21 @@ contains
                     call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
+                    call oclWrite1DFloatArrayBuffer(sm_halo_buf, sm_halo_sz, sm_halo)
+                    state_ptr(1)= ST_HALO_WRITE_VELFG__FEEDBF__LES_CALC_SM
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    state_ptr(1)=state
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    state_ptr(1)= ST_HALO_READ_VELFG__FEEDBF__LES_CALC_SM
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                     call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
                     call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
+                    call oclRead1DFloatArrayBuffer(sm_halo_buf, sm_halo_sz, sm_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                 case (ST_LES_BOUND_SM)
                     max_range = max(ip+3,jp+3,kp+2)
