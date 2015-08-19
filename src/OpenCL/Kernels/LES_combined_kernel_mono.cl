@@ -30,6 +30,13 @@ inline int4 calc_loop_iters(int idx, int im, int jm, int km, int i_off, int j_of
     ijk.s0 = i_off + idx % im;
     return ijk;
 }
+void exchange_1_halo_write(
+    __global float *array,
+    __global float *buffer,
+    const unsigned int im,
+    const unsigned int jm,
+    const unsigned int km
+    );
 void exchange_2_halo_write(
     __global float2 *array,
     __global float *buffer,
@@ -46,6 +53,13 @@ void exchange_4_halo_write(
     );
 void exchange_16_halo_write(
     __global float16 *array,
+    __global float *buffer,
+    const unsigned int im,
+    const unsigned int jm,
+    const unsigned int km
+    );
+void exchange_1_halo_read(
+    __global float *array,
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
@@ -317,7 +331,8 @@ __kernel void LES_combined_kernel_mono (
                 __global float *fgh_halo,
                 __global float *fgh_old_halo,
                 __global float *diu_halo,
-                __global float *mask1_halo
+                __global float *rhs_halo,
+                __global float *sm_halo
         ) {
  unsigned int gl_id = get_global_id(0);
  unsigned int gr_id = get_group_id(0);
@@ -429,8 +444,9 @@ __kernel void LES_combined_kernel_mono (
                 exchange_4_halo_read(uvwsum, uvwsum_halo, im+1, jm+1, km+1);
                 exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
                 exchange_4_halo_read(fgh_old, fgh_old_halo, im, jm, km);
-                exchange_4_halo_read(mask1, mask1_halo, im, jm, km);
                 exchange_16_halo_read(diu, diu_halo, im+4, jm+3, km+3);
+                exchange_1_halo_read(rhs, rhs_halo, im+2, jm+2, km+2);
+                exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2);
                 break;
             }
         case 39:
@@ -440,8 +456,9 @@ __kernel void LES_combined_kernel_mono (
                 exchange_4_halo_write(uvwsum, uvwsum_halo, im+1, jm+1, km+1);
                 exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
                 exchange_4_halo_write(fgh_old, fgh_old_halo, im, jm, km);
-                exchange_4_halo_write(mask1, mask1_halo, im, jm, km);
                 exchange_16_halo_write(diu, diu_halo, im+4, jm+3, km+3);
+                exchange_1_halo_write(rhs, rhs_halo, im+2, jm+2, km+2);
+                exchange_1_halo_write(sm, sm_halo, im+3, jm+3, km+2);
                 break;
             }
         case 13:
@@ -1364,6 +1381,29 @@ void boundp_new(__global float2 *p,const unsigned int im,const unsigned int jm,c
    p[FTNREF3D0(0,jm+1,km+1,ip+3,jp+3)] = p[FTNREF3D0(1,1,km,ip+3,jp+3)];
       p[FTNREF3D0(im+1,jm+1,km+1,ip+3,jp+3)] = p[FTNREF3D0(im,1,km,ip+3,jp+3)];
 }
+void exchange_1_halo_write(
+    __global float *array,
+    __global float *buffer,
+    const unsigned int im,
+    const unsigned int jm,
+    const unsigned int km
+) {
+    const unsigned int v_dim = 1;
+    const unsigned int gl_id = get_global_id(0);
+    const unsigned int k = gl_id % km;
+    const unsigned int i = gl_id / km;
+    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    for (unsigned int v = 0; v < v_dim; v++) {
+        if (i < im && k < km){
+            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im];
+            ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v] = buffer[v*v_sz + km*im + i + k*im];
+        }
+        if (i < jm-1 && k < km && i > 0) {
+            ((__global float*)&array[i*im + k*im*jm])[v] = buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)];
+            ((__global float*)&array[i*im + k*im*jm + (im-1)])[v] = buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)];
+        }
+    }
+}
 void exchange_2_halo_write(
     __global float2 *array,
     __global float *buffer,
@@ -1430,6 +1470,28 @@ void exchange_16_halo_write(
         if (i < jm-1 && k < km && i > 0) {
             ((__global float*)&array[i*im + k*im*jm])[v] = buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)];
             ((__global float*)&array[i*im + k*im*jm + (im-1)])[v] = buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)];
+        }
+    }
+}
+void exchange_1_halo_read(
+    __global float *array,
+    __global float *buffer,
+    const unsigned int im,
+    const unsigned int jm,
+    const unsigned int km
+    ) {const unsigned int v_dim = 1;
+    const unsigned int gl_id = get_global_id(0);
+    const unsigned int k = gl_id % km;
+    const unsigned int i = gl_id / km;
+    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    for (unsigned int v = 0; v < v_dim; v++) {
+        if (i < im && k < km){
+            buffer[v*v_sz + i + k*im] = ((__global float*)&array[i + k*im*jm])[v];
+            buffer[v*v_sz + km*im + i + k*im] = ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v];
+        }
+        if (i < jm-1 && k < km && i > 0) {
+            buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm])[v];
+            buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm + (im-1)])[v];
         }
     }
 }

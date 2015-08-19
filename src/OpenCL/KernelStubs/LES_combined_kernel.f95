@@ -6,7 +6,7 @@ contains
         z2, &
         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s, &
         val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km &
-        , p_halo, uvw_halo, uvwsum_halo, fgh_halo, fgh_old_halo, diu_halo, mask1_halo, local_halo &
+        , p_halo, uvw_halo, uvwsum_halo, fgh_halo, fgh_old_halo, diu_halo, rhs_halo, sm_halo &
         )
       use common_sn
         real(kind=4), dimension(00:1,:ip+2,0:jp+2,0:kp+1), intent(In) :: p_scratch
@@ -48,13 +48,15 @@ contains
         integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
         integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp
         integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3)
-        integer, parameter :: s_mask1 = 8 * (ip+jp+4) * (kp+2)
+        integer, parameter :: s_rhs = 2 * (ip+jp+2) * (kp+2)
+        integer, parameter :: s_sm = 2 * (ip+jp+4) * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
         real(kind=4), dimension(s_fgh) :: fgh_halo
         real(kind=4), dimension(s_fgh_old) :: fgh_old_halo
         real(kind=4), dimension(s_diu) :: diu_halo
-        real(kind=4), dimension(s_mask1) :: mask1_halo
+        real(kind=4), dimension(s_rhs) :: rhs_halo
+        real(kind=4), dimension(s_sm) :: sm_halo
 !
 end module module_LES_combined_kernel

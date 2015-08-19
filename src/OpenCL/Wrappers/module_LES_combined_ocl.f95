@@ -6,11 +6,11 @@
 module module_LES_combined_ocl
     use module_LES_conversions
 ! use module_LES_tests
-    integer :: init_write_fgh_old_to_file = 0
-    integer :: init_write_uvw_p_uvwsum_to_file = 0
     integer :: init_write_uvw_p_to_file = 0
-    integer :: init_run_LES_kernel = 0
+    integer :: init_write_uvw_p_uvwsum_to_file = 0
     integer :: init_initialise_LES_kernel = 0
+    integer :: init_write_fgh_old_to_file = 0
+    integer :: init_run_LES_kernel = 0
 contains
     subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         )
         use oclWrapper
@@ -86,15 +86,16 @@ contains
         integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
         integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp
         integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3)
-        integer, parameter :: s_mask1 = 8 * (ip+jp+4) * (kp+2)
-        !integer, parameter :: s_rhs =
+        integer, parameter :: s_rhs = 2 * (ip+jp+2) * (kp+2)
+        integer, parameter :: s_sm = 2 * (ip+jp+4) * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
         real(kind=4), dimension(s_fgh) :: fgh_halo
         real(kind=4), dimension(s_fgh_old) :: fgh_old_halo
         real(kind=4), dimension(s_diu) :: diu_halo
-        real(kind=4), dimension(s_mask1) :: mask1_halo
+        real(kind=4), dimension(s_rhs) :: rhs_halo
+        real(kind=4), dimension(s_sm) :: sm_halo
         ! -----------------------------------------------------------------------
         ! Combined arrays for OpenCL kernels
         real(kind=4), dimension(0:3,0:ip+1,-1:jp+1,-1:kp+1) :: uvw
@@ -145,7 +146,8 @@ contains
         integer(8) :: fgh_halo_buf
         integer(8) :: fgh_old_halo_buf
         integer(8) :: diu_halo_buf
-        integer(8) :: mask1_halo_buf
+        integer(8) :: rhs_halo_buf
+        integer(8) :: sm_halo_buf
         integer(8) :: uvw_buf
         integer(8) :: uvwsum_buf
         integer(8) :: fgh_buf
@@ -181,7 +183,8 @@ contains
         integer, dimension(1):: fgh_halo_sz
         integer, dimension(1):: fgh_old_halo_sz
         integer, dimension(1):: diu_halo_sz
-        integer, dimension(1):: mask1_halo_sz
+        integer, dimension(1):: rhs_halo_sz
+        integer, dimension(1):: sm_halo_sz
         integer, dimension(4):: uvw_sz
         integer, dimension(4):: uvwsum_sz
         integer, dimension(4):: fgh_sz
@@ -247,7 +250,8 @@ contains
         fgh_halo_sz = shape(fgh_halo)
         fgh_old_halo_sz = shape(fgh_old_halo)
         diu_halo_sz = shape(diu_halo)
-        mask1_halo_sz = shape(mask1_halo)
+        rhs_halo_sz = shape(rhs_halo)
+        sm_halo_sz = shape(sm_halo)
         uvw_sz = shape(uvw)
         uvwsum_sz = shape(uvwsum)
         fgh_sz = shape(fgh)
@@ -284,7 +288,8 @@ contains
         call oclMake1DFloatArrayReadWriteBuffer(fgh_halo_buf,fgh_halo_sz ,fgh_halo)
         call oclMake1DFloatArrayReadWriteBuffer(fgh_old_halo_buf,fgh_old_halo_sz ,fgh_old_halo)
         call oclMake1DFloatArrayReadWriteBuffer(diu_halo_buf,diu_halo_sz ,diu_halo)
-        call oclMake1DFloatArrayReadWriteBuffer(mask1_halo_buf,mask1_halo_sz ,mask1_halo)
+        call oclMake1DFloatArrayReadWriteBuffer(rhs_halo_buf,rhs_halo_sz ,rhs_halo)
+        call oclMake1DFloatArrayReadWriteBuffer(sm_halo_buf,sm_halo_sz ,sm_halo)
         call oclMake4DFloatArrayReadWriteBuffer(uvw_buf,uvw_sz ,uvw)
         call oclMake4DFloatArrayReadWriteBuffer(uvwsum_buf,uvwsum_sz ,uvwsum)
         call oclMake4DFloatArrayReadWriteBuffer(fgh_buf,fgh_sz ,fgh)
@@ -333,7 +338,8 @@ contains
         call oclSetFloatArrayArg(35, fgh_halo_buf )
         call oclSetFloatArrayArg(36, fgh_old_halo_buf )
         call oclSetFloatArrayArg(37, diu_halo_buf )
-        call oclSetFloatArrayArg(38, mask1_halo_buf )
+        call oclSetFloatArrayArg(38, rhs_halo_buf )
+        call oclSetFloatArrayArg(39, sm_halo_buf )
         call oclSetFloatConstArg(28, dt )
         call oclSetIntConstArg(29, im )
         call oclSetIntConstArg(30, jm )
@@ -370,7 +376,8 @@ contains
         call oclWrite1DFloatArrayBuffer(fgh_halo_buf,fgh_halo_sz,fgh_halo)
         call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf,fgh_old_halo_sz,fgh_old_halo)
         call oclWrite1DFloatArrayBuffer(diu_halo_buf,diu_halo_sz,diu_halo)
-        call oclWrite1DFloatArrayBuffer(mask1_halo_buf,mask1_halo_sz,mask1_halo)
+        call oclWrite1DFloatArrayBuffer(rhs_halo_buf,rhs_halo_sz,rhs_halo)
+        call oclWrite1DFloatArrayBuffer(sm_halo_buf,sm_halo_sz,sm_halo)
         call oclWrite4DFloatArrayBuffer(uvw_buf,uvw_sz,uvw)
         call oclWrite4DFloatArrayBuffer(uvwsum_buf,uvwsum_sz,uvwsum)
         call oclWrite4DFloatArrayBuffer(fgh_buf,fgh_sz,fgh)
@@ -384,7 +391,7 @@ contains
         call oclWrite1DIntArrayBuffer(n_ptr_buf,n_ptr_sz,n_ptr)
         call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz,state_ptr)
         
-        ! call LES_combined(p_scratch, uvw, uvwsum, fgh, fgh_old,             rhs, mask1, diu, sm,            dxs, dys, dzs, dx1, dy1, dzn,             z2,             cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,            val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km             , p_halo, uvw_halo, uvwsum_halo, fgh_halo, fgh_old_halo, diu_halo, mask1_halo             )
+        ! call LES_combined(p_scratch, uvw, uvwsum, fgh, fgh_old,             rhs, mask1, diu, sm,            dxs, dys, dzs, dx1, dy1, dzn,             z2,             cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,            val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km             , p_halo, uvw_halo, uvwsum_halo, fgh_halo, fgh_old_halo, diu_halo, rhs_halo, sm_halo             )
         call runOcl(initialise_LES_kernel_globalrange,initialise_LES_kernel_localrange,initialise_LES_kernel_exectime)
         
         ! Read back Read and ReadWrite arrays
@@ -394,7 +401,8 @@ contains
         call oclRead1DFloatArrayBuffer(fgh_halo_buf,fgh_halo_sz,fgh_halo)
         call oclRead1DFloatArrayBuffer(fgh_old_halo_buf,fgh_old_halo_sz,fgh_old_halo)
         call oclRead1DFloatArrayBuffer(diu_halo_buf,diu_halo_sz,diu_halo)
-        call oclRead1DFloatArrayBuffer(mask1_halo_buf,mask1_halo_sz,mask1_halo)
+        call oclRead1DFloatArrayBuffer(rhs_halo_buf,rhs_halo_sz,rhs_halo)
+        call oclRead1DFloatArrayBuffer(sm_halo_buf,sm_halo_sz,sm_halo)
         call oclRead4DFloatArrayBuffer(uvw_buf,uvw_sz,uvw)
         call oclRead4DFloatArrayBuffer(uvwsum_buf,uvwsum_sz,uvwsum)
         call oclRead4DFloatArrayBuffer(fgh_buf,fgh_sz,fgh)
@@ -424,7 +432,8 @@ contains
         oclBuffers(15) = fgh_halo_buf ! HALO
         oclBuffers(16) = fgh_old_halo_buf ! HALO
         oclBuffers(17) = diu_halo_buf ! HALO
-        oclBuffers(18) = mask1_halo_buf ! HALO
+        oclBuffers(18) = rhs_halo_buf ! HALO
+        oclBuffers(19) = sm_halo_buf ! HALO
         oclNunits = initialise_LES_kernel_nunits
         oclNthreadsHint = initialise_LES_kernel_nthreads
     end subroutine initialise_LES_kernel
@@ -479,16 +488,18 @@ contains
         integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
         integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp
         integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3)
-        integer, parameter :: s_mask1 = 8 * (ip+jp+4) * (kp+2)
+        integer, parameter :: s_rhs = 2 * (ip+jp+2) * (kp+2)
+        integer, parameter :: s_sm = 2 * (ip+jp+4) * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
         real(kind=4), dimension(s_fgh) :: fgh_halo
         real(kind=4), dimension(s_fgh_old) :: fgh_old_halo
         real(kind=4), dimension(s_diu) :: diu_halo
-        real(kind=4), dimension(s_mask1) :: mask1_halo
-        integer(8) :: p_halo_buf, uvw_halo_buf, uvwsum_halo_buf, fgh_halo_buf, fgh_old_halo_buf, diu_halo_buf, mask1_halo_buf
-        integer, dimension(1) :: p_halo_sz, uvw_halo_sz, uvwsum_halo_sz, fgh_halo_sz, fgh_old_halo_sz, diu_halo_sz, mask1_halo_sz
+        real(kind=4), dimension(s_rhs) :: rhs_halo
+        real(kind=4), dimension(s_sm) :: sm_halo
+        integer(8) :: p_halo_buf, uvw_halo_buf, uvwsum_halo_buf, fgh_halo_buf, fgh_old_halo_buf, diu_halo_buf, rhs_halo_buf, sm_halo_buf
+        integer, dimension(1) :: p_halo_sz, uvw_halo_sz, uvwsum_halo_sz, fgh_halo_sz, fgh_old_halo_sz, diu_halo_sz, rhs_halo_sz, sm_halo_sz
         integer(8) :: p_buf
         integer(8) :: uvw_buf
         integer(8) :: uvwsum_buf
@@ -537,7 +548,8 @@ contains
         fgh_halo_buf = oclBuffers(15) ! HALO
         fgh_old_halo_buf = oclBuffers(16) ! HALO
         diu_halo_buf = oclBuffers(17) ! HALO
-        mask1_halo_buf = oclBuffers(18) ! HALO
+        rhs_halo_buf = oclBuffers(18) ! HALO
+        sm_halo_buf = oclBuffers(19) ! HALO
         p_sz = shape(po)
         uvw_sz = shape(uvw)
         uvwsum_sz = shape(uvwsum)
@@ -558,16 +570,9 @@ contains
         fgh_halo_sz = shape(fgh_halo)
         fgh_old_halo_sz = shape(fgh_old_halo)
         diu_halo_sz = shape(diu_halo)
-        mask1_halo_sz = shape(mask1_halo)
+        rhs_halo_sz = shape(rhs_halo)
+        sm_halo_sz = shape(sm_halo)
         n_ptr(1)=n
-        ! Tests
-        p_halo = 1.0
-        uvw_halo = 2.0
-        uvwsum_halo = 3.0
-        fgh_halo = 4.0
-        fgh_old_halo = 5.0
-        diu_halo = 6.0
-        mask1_halo = 7.0
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
         ! Read everything in the halo buffers to test things
@@ -618,13 +623,11 @@ contains
                     call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_sz, mask1_halo)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
                     call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
-                    call oclRead1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_sz, mask1_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                 case (ST_VELFG__FEEDBF__LES_CALC_SM)
 !#define NEW_VELFG
@@ -634,13 +637,11 @@ contains
                     call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_sz, mask1_halo)
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
                     call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
-                    call oclRead1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_sz, mask1_halo)
 ! -----------------------------------------------------------------------------------------------------------------------------
                 case (ST_LES_BOUND_SM)
                     max_range = max(ip+3,jp+3,kp+2)

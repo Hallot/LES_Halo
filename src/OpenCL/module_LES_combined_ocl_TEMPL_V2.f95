@@ -112,15 +112,17 @@ contains
         integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
         integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp 
         integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3) 
-        integer, parameter :: s_mask1 = 8 * (ip+jp+4) * (kp+2)
-        !integer, parameter :: s_rhs = 
+        integer, parameter :: s_rhs = 2 * (ip+jp+2) * (kp+2)
+        integer, parameter :: s_sm = 2 * (ip+jp+4) * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
         real(kind=4), dimension(s_fgh) :: fgh_halo
         real(kind=4), dimension(s_fgh_old) :: fgh_old_halo
         real(kind=4), dimension(s_diu) :: diu_halo
-        real(kind=4), dimension(s_mask1) :: mask1_halo
+        real(kind=4), dimension(s_rhs) :: rhs_halo
+        real(kind=4), dimension(s_sm) :: sm_halo
+        
 
         ! -----------------------------------------------------------------------
         ! Combined arrays for OpenCL kernels
@@ -173,7 +175,7 @@ contains
 #endif
             cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,&
             val_ptr, chunks_num, chunks_denom, n_ptr, state_ptr, dt, im, jm, km &
-            , p_halo, uvw_halo, uvwsum_halo, fgh_halo, fgh_old_halo, diu_halo, mask1_halo &
+            , p_halo, uvw_halo, uvwsum_halo, fgh_halo, fgh_old_halo, diu_halo, rhs_halo, sm_halo &
             )
         !$ACC End Kernel
 
@@ -197,7 +199,8 @@ contains
         oclBuffers(15) = fgh_halo_buf ! HALO 
         oclBuffers(16) = fgh_old_halo_buf ! HALO 
         oclBuffers(17) = diu_halo_buf ! HALO 
-        oclBuffers(18) = mask1_halo_buf ! HALO 
+        oclBuffers(18) = rhs_halo_buf ! HALO 
+        oclBuffers(19) = sm_halo_buf ! HALO
         oclNunits = initialise_LES_kernel_nunits
         oclNthreadsHint = initialise_LES_kernel_nthreads
 
@@ -287,17 +290,19 @@ contains
         integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
         integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp 
         integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3) 
-        integer, parameter :: s_mask1 = 8 * (ip+jp+4) * (kp+2)
+        integer, parameter :: s_rhs = 2 * (ip+jp+2) * (kp+2)
+        integer, parameter :: s_sm = 2 * (ip+jp+4) * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
         real(kind=4), dimension(s_fgh) :: fgh_halo
         real(kind=4), dimension(s_fgh_old) :: fgh_old_halo
         real(kind=4), dimension(s_diu) :: diu_halo
-        real(kind=4), dimension(s_mask1) :: mask1_halo
+        real(kind=4), dimension(s_rhs) :: rhs_halo
+        real(kind=4), dimension(s_sm) :: sm_halo
         
-        integer(8) :: p_halo_buf, uvw_halo_buf, uvwsum_halo_buf, fgh_halo_buf, fgh_old_halo_buf, diu_halo_buf, mask1_halo_buf
-        integer, dimension(1) :: p_halo_sz, uvw_halo_sz, uvwsum_halo_sz, fgh_halo_sz, fgh_old_halo_sz, diu_halo_sz, mask1_halo_sz
+        integer(8) :: p_halo_buf, uvw_halo_buf, uvwsum_halo_buf, fgh_halo_buf, fgh_old_halo_buf, diu_halo_buf, rhs_halo_buf, sm_halo_buf
+        integer, dimension(1) :: p_halo_sz, uvw_halo_sz, uvwsum_halo_sz, fgh_halo_sz, fgh_old_halo_sz, diu_halo_sz, rhs_halo_sz, sm_halo_sz
         
         integer(8) :: p_buf
         integer(8) :: uvw_buf
@@ -384,7 +389,8 @@ contains
         fgh_halo_buf = oclBuffers(15) ! HALO
         fgh_old_halo_buf = oclBuffers(16) ! HALO
         diu_halo_buf = oclBuffers(17) ! HALO
-        mask1_halo_buf = oclBuffers(18) ! HALO
+        rhs_halo_buf = oclBuffers(18) ! HALO
+        sm_halo_buf = oclBuffers(19) ! HALO
 
         p_sz = shape(po)
         uvw_sz = shape(uvw)
@@ -409,21 +415,13 @@ contains
         fgh_halo_sz = shape(fgh_halo)
         fgh_old_halo_sz = shape(fgh_old_halo)
         diu_halo_sz = shape(diu_halo)
-        mask1_halo_sz = shape(mask1_halo)
+        rhs_halo_sz = shape(rhs_halo)
+        sm_halo_sz = shape(sm_halo)
 
         n_ptr(1)=n
 #ifdef TIMINGS
          print *, 'run_LES_kernel: time step = ',n
 #endif
-
-        ! Tests
-        p_halo = 1.0
-        uvw_halo = 2.0
-        uvwsum_halo = 3.0
-        fgh_halo = 4.0
-        fgh_old_halo = 5.0
-        diu_halo = 6.0
-        mask1_halo = 7.0
 
 
         ! ========================================================================================================================================================
@@ -547,7 +545,6 @@ contains
                     call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_sz, mask1_halo)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
@@ -555,7 +552,6 @@ contains
                     call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
-                    call oclRead1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_sz, mask1_halo)
                     
                     
 #ifdef TIMINGS
@@ -580,7 +576,6 @@ contains
                     call oclWrite1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
-                    call oclWrite1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_sz, mask1_halo)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
@@ -588,7 +583,6 @@ contains
                     call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
                     call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
-                    call oclRead1DFloatArrayBuffer(mask1_halo_buf, mask1_halo_sz, mask1_halo)
                     
                     
 #ifdef TIMINGS

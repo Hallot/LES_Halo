@@ -193,7 +193,8 @@ __kernel void LES_combined_kernel (
                 __global float *fgh_halo,
                 __global float *fgh_old_halo,
                 __global float *diu_halo,
-                __global float *mask1_halo
+                __global float *rhs_halo,
+                __global float *sm_halo
         ) {
 	unsigned int gl_id = get_global_id(0);
 	unsigned int gr_id = get_group_id(0);
@@ -346,8 +347,9 @@ __kernel void LES_combined_kernel (
                 exchange_4_halo_read(uvwsum, uvwsum_halo, im+1, jm+1, km+1);
                 exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
                 exchange_4_halo_read(fgh_old, fgh_old_halo, im, jm, km);
-                exchange_4_halo_read(mask1, mask1_halo, im, jm, km);
                 exchange_16_halo_read(diu, diu_halo, im+4, jm+3, km+3);
+                exchange_1_halo_read(rhs, rhs_halo, im+2, jm+2, km+2);
+                exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2);
                 break;
             }
         case ST_HALO_WRITE_ALL:
@@ -357,8 +359,9 @@ __kernel void LES_combined_kernel (
                 exchange_4_halo_write(uvwsum, uvwsum_halo, im+1, jm+1, km+1);
                 exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
                 exchange_4_halo_write(fgh_old, fgh_old_halo, im, jm, km);
-                exchange_4_halo_write(mask1, mask1_halo, im, jm, km);
                 exchange_16_halo_write(diu, diu_halo, im+4, jm+3, km+3);
+                exchange_1_halo_write(rhs, rhs_halo, im+2, jm+2, km+2);
+                exchange_1_halo_write(sm, sm_halo, im+3, jm+3, km+2);
                 break;
             }
         case ST_HALO_WRITE_VELNW__BONDV1_INIT_UVW:
