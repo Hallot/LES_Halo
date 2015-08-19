@@ -426,6 +426,30 @@ __kernel void LES_combined_kernel (
                 exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2);
                 break;
             }
+        case ST_HALO_WRITE_LES_CALC_VISC__ADAM:
+            {
+                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
+                exchange_4_halo_write(fgh_old, fgh_old_halo, im, jm, km);
+                break;
+            }
+        case ST_HALO_READ_LES_CALC_VISC__ADAM:
+            {
+                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
+                exchange_4_halo_read(fgh_old, fgh_old_halo, im, jm, km);
+                break;
+            }
+        case ST_HALO_WRITE_PRESS_RHSAV:
+            {
+                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
+                exchange_1_halo_write(rhs, rhs_halo, im+2, jm+2, km+2);
+                break;
+            }
+        case ST_HALO_READ_PRESS_RHSAV:
+            {
+                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
+                exchange_1_halo_read(rhs, rhs_halo, im+2, jm+2, km+2);
+                break;
+            }
         default:    
             n=1;
             // do nothing

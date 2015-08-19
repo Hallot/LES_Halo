@@ -523,6 +523,18 @@ __kernel void LES_combined_kernel (
                 exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2);
                 break;
             }
+        case 23:
+            {
+                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
+                exchange_4_halo_write(fgh_old, fgh_old_halo, im, jm, km);
+                break;
+            }
+        case 24:
+            {
+                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
+                exchange_4_halo_read(fgh_old, fgh_old_halo, im, jm, km);
+                break;
+            }
         default:
             n=1;
     };

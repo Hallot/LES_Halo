@@ -670,13 +670,22 @@ contains
 
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_sz, fgh_old_halo)
-                    call oclWrite1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
+
+                    state_ptr(1)= ST_HALO_WRITE_LES_CALC_VISC__ADAM
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    
+                    state_ptr(1)=state
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
+                    state_ptr(1)= ST_HALO_READ_LES_CALC_VISC__ADAM
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    
                     call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     call oclRead1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_sz, fgh_old_halo)
-                    call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
                     
                     
 #ifdef TIMINGS
