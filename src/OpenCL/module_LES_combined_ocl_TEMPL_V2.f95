@@ -824,12 +824,21 @@ contains
                                 
                                 
                                 call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
-                                call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+
+                                state_ptr(1)= ST_HALO_WRITE_PRESS_SOR
+                                call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                                call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    
+                                state_ptr(1)=state
+                                call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
 
                                 call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                                state_ptr(1)= ST_HALO_READ_PRESS_SOR
+                                call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                                call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                                 
                                 call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
-                                call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
                                 
                                 
 #ifdef TIMINGS

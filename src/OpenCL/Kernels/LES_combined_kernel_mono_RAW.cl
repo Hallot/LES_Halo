@@ -547,6 +547,16 @@ __kernel void LES_combined_kernel (
                 exchange_1_halo_read(rhs, rhs_halo, im+2, jm+2, km+2);
                 break;
             }
+        case 27:
+            {
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case 28:
+            {
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
         default:
             n=1;
     };

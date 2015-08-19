@@ -450,6 +450,26 @@ __kernel void LES_combined_kernel (
                 exchange_1_halo_read(rhs, rhs_halo, im+2, jm+2, km+2);
                 break;
             }
+        case ST_HALO_WRITE_PRESS_SOR:
+            {
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case ST_HALO_READ_PRESS_SOR:
+            {
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case ST_HALO_WRITE_PRESS_PAV:
+            {
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
+        case ST_HALO_READ_PRESS_PAV:
+            {
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
+                break;
+            }
         default:    
             n=1;
             // do nothing
