@@ -422,7 +422,7 @@ __kernel void LES_combined_kernel_mono (
                 press_boundp_kernel(p2, im, jm, km);
                 break;
             }
-        case 40:
+        case 38:
             {
                 exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
                 exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3);
@@ -433,7 +433,7 @@ __kernel void LES_combined_kernel_mono (
                 exchange_16_halo_read(diu, diu_halo, im+4, jm+3, km+3);
                 break;
             }
-        case 41:
+        case 39:
             {
                 exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
                 exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3);

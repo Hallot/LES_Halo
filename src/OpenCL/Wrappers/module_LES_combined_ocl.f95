@@ -7,10 +7,10 @@ module module_LES_combined_ocl
     use module_LES_conversions
 ! use module_LES_tests
     integer :: init_write_fgh_old_to_file = 0
-    integer :: init_initialise_LES_kernel = 0
     integer :: init_write_uvw_p_uvwsum_to_file = 0
-    integer :: init_run_LES_kernel = 0
     integer :: init_write_uvw_p_to_file = 0
+    integer :: init_run_LES_kernel = 0
+    integer :: init_initialise_LES_kernel = 0
 contains
     subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         )
         use oclWrapper
@@ -514,9 +514,9 @@ contains
         integer, parameter :: ST_HALO_WRITE_VELFG__FEEDBF__LES_CALC_SM= 19, ST_HALO_READ_VELFG__FEEDBF__LES_CALC_SM= 20, ST_HALO_WRITE_LES_BOUND_SM= 21
         integer, parameter :: ST_HALO_READ_LES_BOUND_SM= 22, ST_HALO_WRITE_LES_CALC_VISC__ADAM= 23, ST_HALO_READ_LES_CALC_VISC__ADAM= 24
         integer, parameter :: ST_HALO_WRITE_PRESS_RHSAV= 25, ST_HALO_READ_PRESS_RHSAV= 26, ST_HALO_WRITE_PRESS_SOR= 27, ST_HALO_READ_PRESS_SOR= 28
-        integer, parameter :: ST_HALO_WRITE_PRESS_PAV= 29, ST_HALO_READ_PRESS_PAV= 30, ST_HALO_WRITE_PRESS_ADJ= 33
-        integer, parameter :: ST_HALO_READ_PRESS_ADJ= 34, ST_HALO_WRITE_PRESS_BOUNDP= 35, ST_HALO_READ_PRESS_BOUNDP= 36
-        integer, parameter :: ST_HALO_READ_ALL= 40, ST_HALO_WRITE_ALL= 41
+        integer, parameter :: ST_HALO_WRITE_PRESS_PAV= 29, ST_HALO_READ_PRESS_PAV= 33, ST_HALO_WRITE_PRESS_ADJ= 34
+        integer, parameter :: ST_HALO_READ_PRESS_ADJ= 35, ST_HALO_WRITE_PRESS_BOUNDP= 36, ST_HALO_READ_PRESS_BOUNDP= 37
+        integer, parameter :: ST_HALO_READ_ALL= 38, ST_HALO_WRITE_ALL= 39
         real (kind=4) :: exectime
         foldo=0
         goldo=0

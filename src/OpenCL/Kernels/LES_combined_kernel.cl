@@ -112,13 +112,13 @@ CPU_KERNEL: PARALLEL AUTO "BOUNDARY RANGE"
 #define ST_HALO_WRITE_PRESS_SOR 27
 #define ST_HALO_READ_PRESS_SOR 28
 #define ST_HALO_WRITE_PRESS_PAV 29
-#define ST_HALO_READ_PRESS_PAV 30
-#define ST_HALO_WRITE_PRESS_ADJ 33 
-#define ST_HALO_READ_PRESS_ADJ 34
-#define ST_HALO_WRITE_PRESS_BOUNDP 35
-#define ST_HALO_READ_PRESS_BOUNDP 36
-#define ST_HALO_READ_ALL 40
-#define ST_HALO_WRITE_ALL 41
+#define ST_HALO_READ_PRESS_PAV 33
+#define ST_HALO_WRITE_PRESS_ADJ 34 
+#define ST_HALO_READ_PRESS_ADJ 35
+#define ST_HALO_WRITE_PRESS_BOUNDP 36
+#define ST_HALO_READ_PRESS_BOUNDP 37
+#define ST_HALO_READ_ALL 38
+#define ST_HALO_WRITE_ALL 39
 
 // TODO: considering that im,jm,km are always identical to ip,jp,kp which are constants,
 // I could simply define the constants using macros and remove these pesky arguments

@@ -6,10 +6,10 @@ module module_press_ocl
       use module_bondFG
       use module_boundp
     integer :: init_press_pav_ocl = 0
-    integer :: init_press_adj_ocl = 0
-    integer :: init_press_boundp_ocl = 0
-    integer :: init_press_rhsav_ocl = 0
     integer :: init_press_sor_ocl = 0
+    integer :: init_press_adj_ocl = 0
+    integer :: init_press_rhsav_ocl = 0
+    integer :: init_press_boundp_ocl = 0
 contains
       subroutine press_rhsav_ocl(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn3s,cn4l,cn4s,n,nmax,data20,usum,vsum,wsum)
           use oclWrapper
