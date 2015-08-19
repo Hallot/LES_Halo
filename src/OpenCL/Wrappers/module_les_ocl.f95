@@ -5,12 +5,12 @@ module module_les_ocl
     use module_LES_conversions
     use module_les
       use module_boundsm ! add_module_decls() line 156
-        integer :: init_les_calc_visc_ocl = 0
         integer :: init_les_calc_visc__adam_ocl = 0
-        integer :: init_les_bound_sm_ocl = 0
-        integer :: init_bondv1_calc_uvw__velfg__feedbf__les_calc_sm_ocl = 0
-        integer :: init_les_calc_sm_ocl = 0
         integer :: init_merged_velfg_feedbf_les_calc_sm_ocl = 0
+        integer :: init_les_calc_visc_ocl = 0
+        integer :: init_bondv1_calc_uvw__velfg__feedbf__les_calc_sm_ocl = 0
+        integer :: init_les_bound_sm_ocl = 0
+        integer :: init_les_calc_sm_ocl = 0
     contains
     subroutine bondv1_calc_uvw__velfg__feedbf__les_calc_sm_ocl(f,g,h,u,v,w,usum,vsum,wsum,sm,diu1,diu2,diu3,diu4,diu5,diu6,diu7,diu8,diu9,dx1,dy1,dzn,dzs,dxs,uout, bmask1,cmask1,dmask1,dt, im, jm, km)
         use oclWrapper
