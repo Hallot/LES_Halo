@@ -716,12 +716,23 @@ contains
 #endif
 
 
-                    call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    call oclWrite1DFloatArrayBuffer(rhs_halo_buf, rhs_halo_sz, rhs_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+
+                    state_ptr(1)= ST_HALO_WRITE_PRESS_RHSAV
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    
+                    state_ptr(1)=state
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
                     
-                    call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    state_ptr(1)= ST_HALO_READ_PRESS_RHSAV
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    
+                    call oclRead1DFloatArrayBuffer(rhs_halo_buf, rhs_halo_sz, rhs_halo)
                     call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
                     
                     
