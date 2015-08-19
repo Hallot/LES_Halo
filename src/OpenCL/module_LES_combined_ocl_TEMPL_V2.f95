@@ -432,9 +432,17 @@ contains
 #ifndef NO_COMPUTE
 
         ! Read everything in the halo buffers to test things
-        !state_ptr(1)= ST_HALO_READ_ALL
-        !call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
-        !call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+        state_ptr(1)= ST_HALO_READ_ALL
+        call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+        call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+        call oclRead1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
+        call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+        call oclRead1DFloatArrayBuffer(uvwsum_halo_buf, uvwsum_halo_sz, uvwsum_halo)
+        call oclRead1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
+        call oclRead1DFloatArrayBuffer(fgh_old_halo_buf, fgh_old_halo_sz, fgh_old_halo)
+        call oclRead1DFloatArrayBuffer(diu_halo_buf, diu_halo_sz, diu_halo)
+        call oclRead1DFloatArrayBuffer(rhs_halo_buf, rhs_halo_sz, rhs_halo)
+        call oclRead1DFloatArrayBuffer(sm_halo_buf, sm_halo_sz, sm_halo)
 
 
         ! 2. Run the time/state nested loops, copying only time and state
@@ -460,11 +468,6 @@ contains
                     call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
                     call oclWrite1DFloatArrayBuffer(fgh_halo_buf, fgh_halo_sz, fgh_halo)
-                    
-                    
-                    state_ptr(1)= ST_HALO_READ_ALL
-                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
-                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                     
                     state_ptr(1)= ST_HALO_WRITE_VELNW__BONDV1_INIT_UVW
                     call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
@@ -507,8 +510,19 @@ contains
 #endif
 
                     call oclWrite1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
+                    
+                    state_ptr(1)= ST_HALO_WRITE_BONDV1_CALC_UOUT
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
+                    
+                    state_ptr(1)=state
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
 
                     call runOcl(oclGlobalRange,oclLocalRange,exectime)
+                    
+                    state_ptr(1)= ST_HALO_READ_BONDV1_CALC_UOUT
+                    call oclWrite1DIntArrayBuffer(state_ptr_buf,state_ptr_sz, state_ptr)
+                    call runOcl((kp+3) * MAX(ip+4, jp+3),0,exectime)
                     
                     call oclRead1DFloatArrayBuffer(uvw_halo_buf, uvw_halo_sz, uvw_halo)
                     

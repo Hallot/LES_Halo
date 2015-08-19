@@ -475,6 +475,16 @@ __kernel void LES_combined_kernel_mono (
                 exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
                 break;
             }
+        case 15:
+            {
+                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3);
+                break;
+            }
+        case 16:
+            {
+                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3);
+                break;
+            }
         default:
             n=1;
     };
