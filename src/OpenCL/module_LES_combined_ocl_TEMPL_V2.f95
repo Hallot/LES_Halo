@@ -316,7 +316,7 @@ contains
         integer(8) :: val_ptr_buf, n_ptr_buf, state_ptr_buf
 #ifdef EXTERNAL_WIND_PROFILE
         real(kind=4), dimension(jp,kp) , intent(In) :: wind_profile
-        integer(8) :: wind_profile_bufshape(l_out)
+        integer(8) :: wind_profile_buf
         integer, dimension(2) :: wind_profile_sz
 #endif
 
@@ -764,7 +764,6 @@ contains
 !                    call cpu_time(ktimestamp(ST_PRESS_SOR))
                     sor_exectime=0.0
 #endif
-                    call oclRead4DFloatArrayBuffer(p_buf,p_sz,po)
                     
                     call oclWrite1DFloatArrayBuffer(val_ptr_buf,val_ptr_sz, val_ptr)
                     iter = 0
@@ -932,6 +931,8 @@ contains
 #endif
                         oclGlobalRange=ip*jp*kp
                         oclLocalRange=0
+                        
+                        call oclWrite1DFloatArrayBuffer(val_ptr_buf,val_ptr_sz, val_ptr)
 
                         call oclWrite1DFloatArrayBuffer(p_halo_buf, p_halo_sz, p_halo)
 
