@@ -6,11 +6,11 @@
 module module_LES_combined_ocl
     use module_LES_conversions
 ! use module_LES_tests
-    integer :: init_run_LES_kernel = 0
-    integer :: init_initialise_LES_kernel = 0
     integer :: init_write_uvw_p_uvwsum_to_file = 0
-    integer :: init_write_uvw_p_to_file = 0
     integer :: init_write_fgh_old_to_file = 0
+    integer :: init_run_LES_kernel = 0
+    integer :: init_write_uvw_p_to_file = 0
+    integer :: init_initialise_LES_kernel = 0
 contains
     subroutine initialise_LES_kernel (         p,u,v,w,usum,vsum,wsum,f,g,h,fold,gold,hold,         diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9,         amask1, bmask1, cmask1, dmask1,         cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s,         rhs, sm, dxs, dys, dzs, dx1, dy1, dzn,         z2,         dt, im, jm, km         )
         use oclWrapper
@@ -884,9 +884,69 @@ contains
 ! real(kind=4), dimension(:), intent(in) :: northeast_halo
 ! real(kind=4), dimension(:), intent(in) :: southwest_halo
 ! real(kind=4), dimension(:), intent(in) :: southeast_halo
-! integer :: unified_halo_sz
+! integer :: c
+! integer :: v, k, w
+! integer:: nw, n, ne, sw, s, se, we, ea
 !
+! c = 1
 !
+! do v = 1, v_dim
+! ! North
+! do k = 1, km
+! do w = 1, h_w
+! do nw = 1, h_w
+! unified_halo(c) = northwest_halo(im-h_w+nw + (w-1)*im + (k-1)*h_w*im + (v-1)*km*h_w*im)
+! c = c+1
+! end do
+! do n = 1, im
+! unified_halo(c) = north_halo(n + (w-1)*im + (k-1)*h_w*im + (v-1)*km*h_w*im)
+! c = c+1
+! end do
+! do ne = 1, h_w
+! unified_halo(c) = northeast_halo(ne + (w-1)*im + (k-1)*h_w*im + (v-1)*km*h_w*im)
+! c = c+1
+! end do
+! end do
+! end do
+!
+! ! South
+! do k = 1, km
+! do w = 1, h_w
+! do sw = 1, h_w
+! unified_halo(c) = southwest_halo(im-h_w+nw + (w-1)*im + (k-1)*h_w*im + (v-1)*km*h_w*im)
+! c = c+1
+! end do
+! do s = 1, im
+! unified_halo(c) = south_halo(n + (w-1)*im + (k-1)*h_w*im + (v-1)*km*h_w*im)
+! c = c+1
+! end do
+! do se = 1, h_w
+! unified_halo(c) = southeast_halo(ne + (w-1)*im + (k-1)*h_w*im + (v-1)*km*h_w*im)
+! c = c+1
+! end do
+! end do
+! end do
+!
+! ! West
+! do k = 1, km
+! do we = h_w, jm-h_w
+! do w = 1, h_w
+! unified_halo(c) = west_halo(w + (we-h_w)*h_w + (k-1)*(jm-2*h_w)*h_w + (v-1)*km*(jm-2*h_w)*h_w)
+! c = c+1
+! end do
+! end do
+! end do
+!
+! ! East
+! do k = 1, km
+! do ea = h_w, jm-h_w
+! do w = 1, h_w
+! unified_halo(c) = east_halo(w + (ea-h_w)*h_w + (k-1)*(jm-2*h_w)*h_w + (v-1)*km*(jm-2*h_w)*h_w)
+! c = c+1
+! end do
+! end do
+! end do
+! end do ! v
 ! end subroutine create_unified_halo
         ! --------------------------------------------------------------------------------
         ! --------------------------------------------------------------------------------
