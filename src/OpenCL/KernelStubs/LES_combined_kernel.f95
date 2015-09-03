@@ -42,14 +42,15 @@ contains
         ! Halos
         ! Putting the size expressions directly in the arrays crash the combined script
         ! Probably the * symbol
-        integer, parameter :: s_p = 4 * (ip+jp+4) * (kp+2)
-        integer, parameter :: s_uvw = 8 * (ip+jp+3) * (kp+3)
-        integer, parameter :: s_uvwsum = 8 * (ip+jp) * (kp+1)
-        integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
-        integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp
-        integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3)
-        integer, parameter :: s_rhs = 2 * (ip+jp+2) * (kp+2)
-        integer, parameter :: s_sm = 2 * (ip+jp+4) * (kp+2)
+        integer, parameter :: h_w = 1
+        integer, parameter :: s_p = 4 * (ip+jp+6-2*h_w)*h_w * (kp+2)
+        integer, parameter :: s_uvw = 8 * (ip+jp+5-2*h_w)*h_w * (kp+3)
+        integer, parameter :: s_uvwsum = 8 * (ip+jp+2-2*h_w)*h_w * (kp+1)
+        integer, parameter :: s_fgh = 8 * (ip+jp+2-2*h_w)*h_w * (kp+1)
+        integer, parameter :: s_fgh_old = 8 * (ip+jp-2*h_w)*h_w * kp
+        integer, parameter :: s_diu = 32 * (ip+jp+7-2*h_w)*h_w * (kp+3)
+        integer, parameter :: s_rhs = 2 * (ip+jp+4-2*h_w)*h_w * (kp+2)
+        integer, parameter :: s_sm = 2 * (ip+jp+6-2*h_w)*h_w * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo

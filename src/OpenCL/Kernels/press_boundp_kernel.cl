@@ -4,7 +4,9 @@
 #define NEW_BOUNDP
 
 #ifndef COMBINED_KERNEL
+#ifndef MPI
 void boundp12c_(__global float2 *p2,const unsigned int im,const unsigned int jm,const unsigned int km);
+#endif
 void boundp_new (__global float2 *p2,const unsigned int im,const unsigned int jm,const unsigned int km,unsigned int idx_g,unsigned int idx_l);
 #endif
 // ====================================================== KERNEL ===========================================================
@@ -37,7 +39,9 @@ nested loops of course.
 What we should do I guess is simply take the same approach as for bondv1
 */
 #if KERNEL == ORIG_KERNEL
+#ifndef MPI
 		boundp12c_(p,im,jm,km);
+#endif
 #else
 
 		unsigned int max_ij = (im > jm) ? im : jm ;
@@ -191,7 +195,7 @@ p[FTNREF3D0(im+1,0,k,ip+3,jp+3)]=p[FTNREF3D0(im,jm,k,ip+3,jp+3)];
 
 
  * */
-
+#ifndef MPI
 void boundp12c_ (__global float2 *p,const unsigned int im,const unsigned int jm,const unsigned int km) {
 
 	const unsigned int ip = im;
@@ -301,6 +305,8 @@ void boundp12c_ (__global float2 *p,const unsigned int im,const unsigned int jm,
 
  */
 }
+#endif
+
 void boundp_new(__global float2 *p,const unsigned int im,const unsigned int jm,const unsigned int km,unsigned int idx_g,unsigned int idx_l) {
 	const unsigned int ip = im;
 	const unsigned int jp = jm;

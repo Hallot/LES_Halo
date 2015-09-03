@@ -96,24 +96,27 @@ contains
         ! Memory layout for the buffer for a (v_dim, i, j, k) array
         ! First along i, then k, then v_dim
         ! The halos are stored in the following order:
-        ! top|bottom|left|right where top and bottom contain the corners and thus have two more points along i each
+        ! north|south|west|east where north and south contain the corners and thus have two more points along i each
         ! A (2,4,4,2) array would result in the following buffer (!! is the delimitation between halos, ?? between v_dim)
-        ! (1,1,1,1)|(1,2,1,1)|(1,3,1,1)|(1,4,1,1)!(1,1,1,2)|(1,2,1,2)|(1,3,1,2)|(1,4,1,2)!! (top)
-        ! (1,1,4,1)|(1,2,4,1)|(1,3,4,1)|(1,4,4,1)!(1,1,4,2)|(1,2,4,2)|(1,3,4,2)|(1,4,4,2)!! (bottom)
-        ! (1,1,2,1)|(1,1,3,1)|(1,1,2,2)|(1,1,3,2)!! (left)
-        ! (1,4,2,1)|(1,4,3,1)|(1,4,2,2)|(1,4,3,2) (right)
+        ! (1,1,1,1)|(1,2,1,1)|(1,3,1,1)|(1,4,1,1)!(1,1,1,2)|(1,2,1,2)|(1,3,1,2)|(1,4,1,2)!! (north)
+        ! (1,1,4,1)|(1,2,4,1)|(1,3,4,1)|(1,4,4,1)!(1,1,4,2)|(1,2,4,2)|(1,3,4,2)|(1,4,4,2)!! (south)
+        ! (1,1,2,1)|(1,1,3,1)|(1,1,2,2)|(1,1,3,2)!! (west)
+        ! (1,4,2,1)|(1,4,3,1)|(1,4,2,2)|(1,4,3,2) (east)
         ! ?? (new dimension along v_dim)
-        ! (2,1,1,1)|(2,2,1,1)|(2,3,1,1)|(2,4,1,1)!(2,1,1,2)|(2,2,1,2)|(2,3,1,2)|(2,4,1,2)!! (top)
+        ! (2,1,1,1)|(2,2,1,1)|(2,3,1,1)|(2,4,1,1)!(2,1,1,2)|(2,2,1,2)|(2,3,1,2)|(2,4,1,2)!! (north)
         ! ... (same as above)
-        ! (2,4,2,1)|(2,4,3,1)|(2,4,2,2)|(2,4,3,2) (right)
-        integer, parameter :: s_p = 4 * (ip+jp+4) * (kp+2)
-        integer, parameter :: s_uvw = 8 * (ip+jp+3) * (kp+3)
-        integer, parameter :: s_uvwsum = 8 * (ip+jp) * (kp+1)
-        integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
-        integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp 
-        integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3) 
-        integer, parameter :: s_rhs = 2 * (ip+jp+2) * (kp+2)
-        integer, parameter :: s_sm = 2 * (ip+jp+4) * (kp+2)
+        ! (2,4,2,1)|(2,4,3,1)|(2,4,2,2)|(2,4,3,2) (east)
+        
+        ! width of the halo, 1 in our case
+        integer, parameter :: h_w = 1
+        integer, parameter :: s_p =  4 * (ip+jp+6-2*h_w)*h_w * (kp+2)
+        integer, parameter :: s_uvw = 8 * (ip+jp+5-2*h_w)*h_w * (kp+3)
+        integer, parameter :: s_uvwsum = 8 * (ip+jp+2-2*h_w)*h_w * (kp+1)
+        integer, parameter :: s_fgh = 8 * (ip+jp+2-2*h_w)*h_w * (kp+1)
+        integer, parameter :: s_fgh_old = 8 * (ip+jp-2*h_w)*h_w * kp 
+        integer, parameter :: s_diu = 32 * (ip+jp+7-2*h_w)*h_w * (kp+3) 
+        integer, parameter :: s_rhs = 2 * (ip+jp+4-2*h_w)*h_w * (kp+2)
+        integer, parameter :: s_sm = 2 * (ip+jp+6-2*h_w)*h_w * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
@@ -284,14 +287,15 @@ contains
         integer, dimension(256) :: state_ptr
         
         ! Halos
-        integer, parameter :: s_p = 4 * (ip+jp+4) * (kp+2)
-        integer, parameter :: s_uvw = 8 * (ip+jp+3) * (kp+3)
-        integer, parameter :: s_uvwsum = 8 * (ip+jp) * (kp+1)
-        integer, parameter :: s_fgh = 8 * (ip+jp) * (kp+1)
-        integer, parameter :: s_fgh_old = 8 * (ip+jp-2) * kp 
-        integer, parameter :: s_diu = 32 * (ip+jp+5) * (kp+3) 
-        integer, parameter :: s_rhs = 2 * (ip+jp+2) * (kp+2)
-        integer, parameter :: s_sm = 2 * (ip+jp+4) * (kp+2)
+        integer, parameter :: h_w = 1
+        integer, parameter :: s_p =  4 * (ip+jp+6-2*h_w)*h_w * (kp+2)
+        integer, parameter :: s_uvw = 8 * (ip+jp+5-2*h_w)*h_w * (kp+3)
+        integer, parameter :: s_uvwsum = 8 * (ip+jp+2-2*h_w)*h_w * (kp+1)
+        integer, parameter :: s_fgh = 8 * (ip+jp+2-2*h_w)*h_w * (kp+1)
+        integer, parameter :: s_fgh_old = 8 * (ip+jp-2*h_w)*h_w * kp 
+        integer, parameter :: s_diu = 32 * (ip+jp+7-2*h_w)*h_w * (kp+3) 
+        integer, parameter :: s_rhs = 2 * (ip+jp+4-2*h_w)*h_w * (kp+2)
+        integer, parameter :: s_sm = 2 * (ip+jp+6-2*h_w)*h_w * (kp+2)
         real(kind=4), dimension(s_p) :: p_halo
         real(kind=4), dimension(s_uvw) :: uvw_halo
         real(kind=4), dimension(s_uvwsum) :: uvwsum_halo
@@ -1065,6 +1069,44 @@ contains
 #endif
 #endif
         end subroutine run_LES_kernel
+        
+
+        ! Subroutines to extract and create the unified halos from separate halos
+!         subroutine extract_halos(unified_halo, north_halo, south_halo, west_halo, east_halo, v_dim, im, jm, km, h_w)
+!             integer, intent(in) :: v_dim, im, jm, km, h_w
+!             real(kind=4), dimension(:), intent(in)  :: unified_halo
+!             real(kind=4), dimension(:), intent(out)  :: north_halo
+!             real(kind=4), dimension(:), intent(out)  :: south_halo
+!             real(kind=4), dimension(:), intent(out)  :: west_halo
+!             real(kind=4), dimension(:), intent(out)  :: east_halo
+!             !unified_halo_sz = v_dim * 2*h_w * (im+jm-2*h_w) * km
+!             integer:: north_sz, south_sz, west_sz, east_sz
+!             
+!             north_sz = 2 * im * km * h_w * v_dim
+!             south_sz = 2* north_sz
+!             west_sz = south_sz + 2 * (jm-2*h_w) * h_w * km * v_dim
+!             east_sz = west_sz + 2 * (jm-2*h_w) * h_w * km * v_dim
+!             north_halo(:) = unified_halo(1:north_sz)
+!             south_halo(:) = unified_halo(north_sz+1:south_sz)
+!             west_halo(:) = unified_halo(south_sz+1:west_sz)
+!             east_halo(:) = unified_halo(west_sz+1:east_sz)
+!         end subroutine extract_halos
+!         
+!         subroutine create_unified_halo(unified_halo, north_halo, south_halo, west_halo, east_halo, northwest_halo, northeast_halo, southwest_halo, southeast_halo, v_dim, im, jm, km, h_w)
+!             integer, intent(in) :: v_dim, im, jm, km, h_w
+!             real(kind=4), dimension(:), intent(out)  :: unified_halo
+!             real(kind=4), dimension(:), intent(in)  :: north_halo
+!             real(kind=4), dimension(:), intent(in)  :: south_halo
+!             real(kind=4), dimension(:), intent(in)  :: west_halo
+!             real(kind=4), dimension(:), intent(in)  :: east_halo
+!             real(kind=4), dimension(:), intent(in)  :: northwest_halo
+!             real(kind=4), dimension(:), intent(in)  :: northeast_halo
+!             real(kind=4), dimension(:), intent(in)  :: southwest_halo
+!             real(kind=4), dimension(:), intent(in)  :: southeast_halo
+!             integer :: unified_halo_sz
+!             
+!             
+!         end subroutine create_unified_halo
         
         
         ! --------------------------------------------------------------------------------

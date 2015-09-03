@@ -487,6 +487,7 @@ __SUBKERNEL void press_sor_kernel(
 										calc_sor_j = false;
 									}
 #endif // NEW_ITER_ORDER
+#ifndef MPI
 								// So the idea is that this call will calculate the new boundary conditions for p or p2
 								float reltmp_mp = calc_reltmp_mp_db(p2, rhs, rhsav,
 										cn1, cn2l, cn2s, cn3l, cn3s, cn4l, cn4s, i, j, k,
@@ -501,6 +502,7 @@ __SUBKERNEL void press_sor_kernel(
 								if (calc_sor_i && calc_sor_j && calc_sor_k) {
 									local_sor += reltmp_mp * reltmp_mp;
 								}
+#endif
 							}
 #ifdef FIXED_NTH
 						} // if j<=jm+1
@@ -589,8 +591,10 @@ __SUBKERNEL void press_sor_kernel(
 					  //boundp1
 					  //--computational boundary(neumann condition)
 					  // adjust i=0 and i=im+1 for all j and k
+#ifndef MPI
 					p2[FTNREF3D0(0,j,k,ip+3,jp+3)].s0 = p2[FTNREF3D0(1,j,k,ip+3,jp+3)].s0;
 					p2[FTNREF3D0(im + 1,j,k,ip+3,jp+3)].s0 = p2[FTNREF3D0(im,j,k,ip+3,jp+3)].s0;
+#endif
 #ifdef FIXED_NTH
 				} //if j<jm
 			} // for jl
@@ -614,8 +618,10 @@ __SUBKERNEL void press_sor_kernel(
 					  //boundp1
 					  //--computational boundary(neumann condition)
 					  // adjust i=0 and i=im+1 for all j and k
+#ifndef MPI
 						p2[FTNREF3D0(0,j,k,ip+3,jp+3)].s0 = p2[FTNREF3D0(1,j,k,ip+3,jp+3)].s0;
 						p2[FTNREF3D0(im + 1,j,k,ip+3,jp+3)].s0 = p2[FTNREF3D0(im,j,k,ip+3,jp+3)].s0;
+#endif
 #ifdef FIXED_NTH
 					} // for kl
 
@@ -630,6 +636,7 @@ __SUBKERNEL void press_sor_kernel(
 		barrier(CLK_LOCAL_MEM_FENCE);
 #endif
 
+#ifndef MPI
 #ifdef FIXED_NTH
 			// boundary conditions for j=0 and j = jm+1, for all i and k
 			for (unsigned int kl = kl_start; kl<kl_stop; kl++) {
@@ -641,6 +648,7 @@ __SUBKERNEL void press_sor_kernel(
 				}
 #ifdef FIXED_NTH
 			} // kl
+#endif
 #endif
 //			if (l_id==0) {
 			float local_sor_acc = 0.0F;// chunks_num[gr_id];
@@ -660,6 +668,7 @@ __SUBKERNEL void press_sor_kernel(
 	} else { // nrd==2
 		//boundp2
 		//--computational boundary(neumann condition)
+#ifndef MPI
 #ifndef FIXED_NTH
     	unsigned int i = gr_id;
     	unsigned int j = l_id;
@@ -681,6 +690,7 @@ __SUBKERNEL void press_sor_kernel(
 				}
 			}
 		}
+#endif
 #endif
 	} // nrd
 

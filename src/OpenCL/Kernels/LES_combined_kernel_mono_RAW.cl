@@ -35,56 +35,64 @@ void exchange_1_halo_write(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 void exchange_2_halo_write(
     __global float2 *array,
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 void exchange_4_halo_write(
     __global float4 *array,
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 void exchange_16_halo_write(
     __global float16 *array,
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 void exchange_1_halo_read(
     __global float *array,
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 void exchange_2_halo_read(
     __global float2 *array,
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 void exchange_4_halo_read(
     __global float4 *array,
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 void exchange_16_halo_read(
     __global float16 *array,
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 void velnw__bondv1_init_uvw_kernel (
     __global float2 * p,
@@ -439,152 +447,152 @@ __kernel void LES_combined_kernel (
             }
         case 38:
             {
-                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
-                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3);
-                exchange_4_halo_read(uvwsum, uvwsum_halo, im+1, jm+1, km+1);
-                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
-                exchange_4_halo_read(fgh_old, fgh_old_halo, im, jm, km);
-                exchange_16_halo_read(diu, diu_halo, im+4, jm+3, km+3);
-                exchange_1_halo_read(rhs, rhs_halo, im+2, jm+2, km+2);
-                exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2);
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2, 1);
+                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3, 1);
+                exchange_4_halo_read(uvwsum, uvwsum_halo, im+1, jm+1, km+1, 1);
+                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1, 1);
+                exchange_4_halo_read(fgh_old, fgh_old_halo, im, jm, km, 1);
+                exchange_16_halo_read(diu, diu_halo, im+4, jm+3, km+3, 1);
+                exchange_1_halo_read(rhs, rhs_halo, im+2, jm+2, km+2, 1);
+                exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 39:
             {
-                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
-                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3);
-                exchange_4_halo_write(uvwsum, uvwsum_halo, im+1, jm+1, km+1);
-                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
-                exchange_4_halo_write(fgh_old, fgh_old_halo, im, jm, km);
-                exchange_16_halo_write(diu, diu_halo, im+4, jm+3, km+3);
-                exchange_1_halo_write(rhs, rhs_halo, im+2, jm+2, km+2);
-                exchange_1_halo_write(sm, sm_halo, im+3, jm+3, km+2);
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2, 1);
+                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3, 1);
+                exchange_4_halo_write(uvwsum, uvwsum_halo, im+1, jm+1, km+1, 1);
+                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1, 1);
+                exchange_4_halo_write(fgh_old, fgh_old_halo, im, jm, km, 1);
+                exchange_16_halo_write(diu, diu_halo, im+4, jm+3, km+3, 1);
+                exchange_1_halo_write(rhs, rhs_halo, im+2, jm+2, km+2, 1);
+                exchange_1_halo_write(sm, sm_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 13:
             {
-                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
-                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3);
-                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2, 1);
+                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3, 1);
+                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1, 1);
                 break;
             }
         case 14:
             {
-                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
-                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3);
-                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2, 1);
+                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3, 1);
+                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1, 1);
                 break;
             }
         case 15:
             {
-                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3);
+                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3, 1);
                 break;
             }
         case 16:
             {
-                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3);
+                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3, 1);
                 break;
             }
         case 17:
             {
-                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3);
+                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3, 1);
                 break;
             }
         case 18:
             {
-                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3);
+                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3, 1);
                 break;
             }
         case 19:
             {
-                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3);
-                exchange_4_halo_write(uvwsum, uvwsum_halo, im+1, jm+1, km+1);
-                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
-                exchange_16_halo_write(diu, diu_halo, im+4, jm+3, km+3);
-                exchange_1_halo_write(sm, sm_halo, im+3, jm+3, km+2);
+                exchange_4_halo_write(uvw, uvw_halo, im+2, jm+3, km+3, 1);
+                exchange_4_halo_write(uvwsum, uvwsum_halo, im+1, jm+1, km+1, 1);
+                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1, 1);
+                exchange_16_halo_write(diu, diu_halo, im+4, jm+3, km+3, 1);
+                exchange_1_halo_write(sm, sm_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 20:
             {
-                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3);
-                exchange_4_halo_read(uvwsum, uvwsum_halo, im+1, jm+1, km+1);
-                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
-                exchange_16_halo_read(diu, diu_halo, im+4, jm+3, km+3);
-                exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2);
+                exchange_4_halo_read(uvw, uvw_halo, im+2, jm+3, km+3, 1);
+                exchange_4_halo_read(uvwsum, uvwsum_halo, im+1, jm+1, km+1, 1);
+                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1, 1);
+                exchange_16_halo_read(diu, diu_halo, im+4, jm+3, km+3, 1);
+                exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 21:
             {
-                exchange_1_halo_write(sm, sm_halo, im+3, jm+3, km+2);
+                exchange_1_halo_write(sm, sm_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 22:
             {
-                exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2);
+                exchange_1_halo_read(sm, sm_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 23:
             {
-                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
-                exchange_4_halo_write(fgh_old, fgh_old_halo, im, jm, km);
+                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1, 1);
+                exchange_4_halo_write(fgh_old, fgh_old_halo, im, jm, km, 1);
                 break;
             }
         case 24:
             {
-                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
-                exchange_4_halo_read(fgh_old, fgh_old_halo, im, jm, km);
+                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1, 1);
+                exchange_4_halo_read(fgh_old, fgh_old_halo, im, jm, km, 1);
                 break;
             }
         case 25:
             {
-                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1);
-                exchange_1_halo_write(rhs, rhs_halo, im+2, jm+2, km+2);
+                exchange_4_halo_write(fgh, fgh_halo, im+1, jm+1, km+1, 1);
+                exchange_1_halo_write(rhs, rhs_halo, im+2, jm+2, km+2, 1);
                 break;
             }
         case 26:
             {
-                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1);
-                exchange_1_halo_read(rhs, rhs_halo, im+2, jm+2, km+2);
+                exchange_4_halo_read(fgh, fgh_halo, im+1, jm+1, km+1, 1);
+                exchange_1_halo_read(rhs, rhs_halo, im+2, jm+2, km+2, 1);
                 break;
             }
         case 27:
             {
-                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 28:
             {
-                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 29:
             {
-                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 33:
             {
-                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 34:
             {
-                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 35:
             {
-                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 36:
             {
-                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2);
+                exchange_2_halo_write(p2, p_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         case 37:
             {
-                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2);
+                exchange_2_halo_read(p2, p_halo, im+3, jm+3, km+2, 1);
                 break;
             }
         default:
@@ -1498,21 +1506,24 @@ void exchange_1_halo_write(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
 ) {
     const unsigned int v_dim = 1;
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < im && k < km){
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im];
-            ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v] = buffer[v*v_sz + km*im + i + k*im];
+        if (i < h_w*im && k < km){
+            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
+            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
         }
-        if (i < jm-1 && k < km && i > 0) {
-            ((__global float*)&array[i*im + k*im*jm])[v] = buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)];
-            ((__global float*)&array[i*im + k*im*jm + (im-1)])[v] = buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)];
+        if (i < jm-h_w && k < km && i > h_w-1) {
+            for (unsigned int w = 0; w < h_w; w++) {
+            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+            }
         }
     }
 }
@@ -1521,21 +1532,24 @@ void exchange_2_halo_write(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
 ) {
     const unsigned int v_dim = 2;
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < im && k < km){
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im];
-            ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v] = buffer[v*v_sz + km*im + i + k*im];
+         if (i < h_w*im && k < km){
+            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
+            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
         }
-        if (i < jm-1 && k < km && i > 0) {
-            ((__global float*)&array[i*im + k*im*jm])[v] = buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)];
-            ((__global float*)&array[i*im + k*im*jm + (im-1)])[v] = buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)];
+        if (i < jm-h_w && k < km && i > h_w-1) {
+            for (unsigned int w = 0; w < h_w; w++) {
+            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+            }
         }
     }
 }
@@ -1544,21 +1558,24 @@ void exchange_4_halo_write(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
 ) {
     const unsigned int v_dim = 4;
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < im && k < km){
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im];
-            ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v] = buffer[v*v_sz + km*im + i + k*im];
+         if (i < h_w*im && k < km){
+            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
+            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
         }
-        if (i < jm-1 && k < km && i > 0) {
-            ((__global float*)&array[i*im + k*im*jm])[v] = buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)];
-            ((__global float*)&array[i*im + k*im*jm + (im-1)])[v] = buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)];
+        if (i < jm-h_w && k < km && i > h_w-1) {
+            for (unsigned int w = 0; w < h_w; w++) {
+            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+            }
         }
     }
 }
@@ -1567,21 +1584,24 @@ void exchange_16_halo_write(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
 ) {
     const unsigned int v_dim = 16;
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < im && k < km){
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im];
-            ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v] = buffer[v*v_sz + km*im + i + k*im];
+         if (i < h_w*im && k < km){
+            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
+            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
         }
-        if (i < jm-1 && k < km && i > 0) {
-            ((__global float*)&array[i*im + k*im*jm])[v] = buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)];
-            ((__global float*)&array[i*im + k*im*jm + (im-1)])[v] = buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)];
+        if (i < jm-h_w && k < km && i > h_w-1) {
+            for (unsigned int w = 0; w < h_w; w++) {
+            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+            }
         }
     }
 }
@@ -1590,20 +1610,24 @@ void exchange_1_halo_read(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
-    ) {const unsigned int v_dim = 1;
+    const unsigned int km,
+    const unsigned int h_w
+) {
+    const unsigned int v_dim = 1;
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < im && k < km){
-            buffer[v*v_sz + i + k*im] = ((__global float*)&array[i + k*im*jm])[v];
-            buffer[v*v_sz + km*im + i + k*im] = ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v];
+        if (i < h_w*im && k < km){
+            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
         }
-        if (i < jm-1 && k < km && i > 0) {
-            buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm])[v];
-            buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm + (im-1)])[v];
+        if (i < jm-h_w && k < km && i > h_w-1) {
+            for (unsigned int w = 0; w < h_w; w++) {
+            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+            }
         }
     }
 }
@@ -1612,20 +1636,24 @@ void exchange_2_halo_read(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
-    ) {const unsigned int v_dim = 2;
+    const unsigned int km,
+    const unsigned int h_w
+    ) {
+    const unsigned int v_dim = 2;
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < im && k < km){
-            buffer[v*v_sz + i + k*im] = ((__global float*)&array[i + k*im*jm])[v];
-            buffer[v*v_sz + km*im + i + k*im] = ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v];
+        if (i < h_w*im && k < km){
+            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
         }
-        if (i < jm-1 && k < km && i > 0) {
-            buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm])[v];
-            buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm + (im-1)])[v];
+        if (i < jm-h_w && k < km && i > h_w-1) {
+            for (unsigned int w = 0; w < h_w; w++) {
+            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+            }
         }
     }
 }
@@ -1634,20 +1662,24 @@ void exchange_4_halo_read(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
-    ) {const unsigned int v_dim = 4;
+    const unsigned int km,
+    const unsigned int h_w
+    ) {
+    const unsigned int v_dim = 4;
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < im && k < km){
-            buffer[v*v_sz + i + k*im] = ((__global float*)&array[i + k*im*jm])[v];
-            buffer[v*v_sz + km*im + i + k*im] = ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v];
+        if (i < h_w*im && k < km){
+            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
         }
-        if (i < jm-1 && k < km && i > 0) {
-            buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm])[v];
-            buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm + (im-1)])[v];
+        if (i < jm-h_w && k < km && i > h_w-1) {
+            for (unsigned int w = 0; w < h_w; w++) {
+            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+            }
         }
     }
 }
@@ -1656,20 +1688,24 @@ void exchange_16_halo_read(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
-    ) {const unsigned int v_dim = 16;
+    const unsigned int km,
+    const unsigned int h_w
+    ) {
+    const unsigned int v_dim = 16;
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im + 2*km*(jm-2);
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < im && k < km){
-            buffer[v*v_sz + i + k*im] = ((__global float*)&array[i + k*im*jm])[v];
-            buffer[v*v_sz + km*im + i + k*im] = ((__global float*)&array[i + k*im*jm + im*(jm-1)])[v];
+        if (i < h_w*im && k < km){
+            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
         }
-        if (i < jm-1 && k < km && i > 0) {
-            buffer[v*v_sz + km*im*2 + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm])[v];
-            buffer[v*v_sz + km*im*2 + km*(jm-2) + i-1 + k*(jm-2)] = ((__global float*)&array[i*im + k*im*jm + (im-1)])[v];
+        if (i < jm-h_w && k < km && i > h_w-1) {
+            for (unsigned int w = 0; w < h_w; w++) {
+            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+            }
         }
     }
 }

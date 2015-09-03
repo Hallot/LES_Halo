@@ -168,23 +168,28 @@ void exchange_1_halo_read(
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
+    // h_w*h_w*km is the size of a corner, and there are 4 of them
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w - 4*h_w*h_w*km;
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
         if (i < h_w*im && k < km){
-            // north halo
-            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
-            // south halo
-            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
+            if (i%im > h_w-1 && i%im < im-h_w) {
+                // north halo
+                // (h_w+(i/im)*2*h_w*(k+1)) is the offset for removing the 2 corners
+                buffer[v*v_sz + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[h_w*im + i + k*im*jm])[v];
+                // south halo
+                // km*(im-h_w)*h_w is the new size of the north halo
+                buffer[v*v_sz + km*(im-h_w)*h_w + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[i - h_w*im + k*im*jm + im*(jm-h_w)])[v];
+            }
         }
 
         if (i < jm-h_w && k < km && i > h_w-1) {
             for (unsigned int w = 0; w < h_w; w++) {
             // west halo
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
             // east halo
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w - h_w + k*im*jm + im-h_w+w])[v];
             }
         }
     }
@@ -202,23 +207,25 @@ void exchange_2_halo_read(
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w - 4*h_w*h_w*km;
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
         if (i < h_w*im && k < km){
-            // north halo
-            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
-            // south halo
-            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
+            if (i%im > h_w-1 && i%im < im-h_w) {
+                // north halo
+                buffer[v*v_sz + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[h_w*im + i + k*im*jm])[v];
+                // south halo
+                buffer[v*v_sz + km*(im-h_w)*h_w + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[i - h_w*im + k*im*jm + im*(jm-h_w)])[v];
+            }
         }
 
         if (i < jm-h_w && k < km && i > h_w-1) {
             for (unsigned int w = 0; w < h_w; w++) {
             // west halo
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
             // east halo
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w - h_w + k*im*jm + im-h_w+w])[v];
             }
         }
     }
@@ -236,23 +243,25 @@ void exchange_4_halo_read(
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w - 4*h_w*h_w*km;
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
         if (i < h_w*im && k < km){
-            // north halo
-            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
-            // south halo
-            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
+            if (i%im > h_w-1 && i%im < im-h_w) {
+                // north halo
+                buffer[v*v_sz + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[h_w*im + i + k*im*jm])[v];
+                // south halo
+                buffer[v*v_sz + km*(im-h_w)*h_w + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[i - h_w*im + k*im*jm + im*(jm-h_w)])[v];
+            }
         }
 
         if (i < jm-h_w && k < km && i > h_w-1) {
             for (unsigned int w = 0; w < h_w; w++) {
             // west halo
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
             // east halo
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w - h_w + k*im*jm + im-h_w+w])[v];
             }
         }
     }
@@ -271,23 +280,25 @@ void exchange_16_halo_read(
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
+    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w - 4*h_w*h_w*km;
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
         if (i < h_w*im && k < km){
-            // north halo
-            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
-            // south halo
-            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
+            if (i%im > h_w-1 && i%im < im-h_w) {
+                // north halo
+                buffer[v*v_sz + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[h_w*im + i + k*im*jm])[v];
+                // south halo
+                buffer[v*v_sz + km*(im-h_w)*h_w + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[i - h_w*im + k*im*jm + im*(jm-h_w)])[v];
+            }
         }
 
         if (i < jm-h_w && k < km && i > h_w-1) {
             for (unsigned int w = 0; w < h_w; w++) {
             // west halo
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
             // east halo
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w - h_w + k*im*jm + im-h_w+w])[v];
             }
         }
     }

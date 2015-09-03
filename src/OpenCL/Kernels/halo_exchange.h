@@ -3,7 +3,8 @@ void exchange_1_halo_write(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 
 void exchange_2_halo_write(
@@ -11,7 +12,8 @@ void exchange_2_halo_write(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 
 void exchange_4_halo_write(
@@ -19,7 +21,8 @@ void exchange_4_halo_write(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 
 void exchange_16_halo_write(
@@ -27,7 +30,8 @@ void exchange_16_halo_write(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 
 void exchange_1_halo_read(
@@ -35,7 +39,8 @@ void exchange_1_halo_read(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 
 void exchange_2_halo_read(
@@ -43,7 +48,8 @@ void exchange_2_halo_read(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 
 void exchange_4_halo_read(
@@ -51,7 +57,8 @@ void exchange_4_halo_read(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
 
 void exchange_16_halo_read(
@@ -59,5 +66,6 @@ void exchange_16_halo_read(
     __global float *buffer,
     const unsigned int im,
     const unsigned int jm,
-    const unsigned int km
+    const unsigned int km,
+    const unsigned int h_w
     );
