@@ -1515,14 +1515,14 @@ void exchange_1_halo_write(
     const unsigned int i = gl_id / km;
     const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < h_w*im && k < km){
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
-            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
-        }
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
-            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                ((__global float*)&array[i + im*w + k*im*jm])[v] = buffer[v*v_sz + i + im*w + k*im*h_w];
+                ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + im*w + k*im*h_w];
+            }
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -1541,14 +1541,14 @@ void exchange_2_halo_write(
     const unsigned int i = gl_id / km;
     const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-         if (i < h_w*im && k < km){
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
-            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
-        }
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
-            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                ((__global float*)&array[i + im*w + k*im*jm])[v] = buffer[v*v_sz + i + im*w + k*im*h_w];
+                ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + im*w + k*im*h_w];
+            }
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -1567,14 +1567,14 @@ void exchange_4_halo_write(
     const unsigned int i = gl_id / km;
     const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-         if (i < h_w*im && k < km){
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
-            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
-        }
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
-            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+         for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                ((__global float*)&array[i + im*w + k*im*jm])[v] = buffer[v*v_sz + i + im*w + k*im*h_w];
+                ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + im*w + k*im*h_w];
+            }
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -1593,14 +1593,14 @@ void exchange_16_halo_write(
     const unsigned int i = gl_id / km;
     const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-         if (i < h_w*im && k < km){
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
-            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
-        }
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
-            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+         for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                ((__global float*)&array[i + im*w + k*im*jm])[v] = buffer[v*v_sz + i + im*w + k*im*h_w];
+                ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + im*w + k*im*h_w];
+            }
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -1619,14 +1619,14 @@ void exchange_1_halo_read(
     const unsigned int i = gl_id / km;
     const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < h_w*im && k < km){
-            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
-            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
-        }
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                buffer[v*v_sz + i + im*w + k*im*h_w] = ((__global float*)&array[i + im*w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w + i + im*w + k*im*h_w] = ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v];
+            }
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
             }
         }
     }
@@ -1645,14 +1645,14 @@ void exchange_2_halo_read(
     const unsigned int i = gl_id / km;
     const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < h_w*im && k < km){
-            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
-            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
-        }
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                buffer[v*v_sz + i + im*w + k*im*h_w] = ((__global float*)&array[i + im*w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w + i + im*w + k*im*h_w] = ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v];
+            }
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
             }
         }
     }
@@ -1671,14 +1671,14 @@ void exchange_4_halo_read(
     const unsigned int i = gl_id / km;
     const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < h_w*im && k < km){
-            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
-            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
-        }
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                buffer[v*v_sz + i + im*w + k*im*h_w] = ((__global float*)&array[i + im*w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w + i + im*w + k*im*h_w] = ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v];
+            }
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
             }
         }
     }
@@ -1697,14 +1697,14 @@ void exchange_16_halo_read(
     const unsigned int i = gl_id / km;
     const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w;
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < h_w*im && k < km){
-            buffer[v*v_sz + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm])[v];
-            buffer[v*v_sz + km*im*h_w + i + k*im*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v];
-        }
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v];
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                buffer[v*v_sz + i + im*w + k*im*h_w] = ((__global float*)&array[i + im*w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w + i + im*w + k*im*h_w] = ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v];
+            }
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
             }
         }
     }
