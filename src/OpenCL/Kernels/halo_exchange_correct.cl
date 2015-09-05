@@ -16,34 +16,34 @@ void exchange_1_halo_write(
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
-        // index along the row
-        // im is one row, times the width of the halo
-        if (i < h_w*im && k < km){
-            // north halo
-            // i is the index to copy in the row, k*im*jm is the index of the vertical plane
-            // v*v_sz is the vector offset for v_dim, i the index of the row, k*im*h_w the offset for the index of the next plane
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
-            // south halo
-            // im*(jm-h_w) is the offset to go to the last h_w rows of the plane
-            // km*im*h_w is the size of the north halo, so the offset to go to the first element of the south halo
-            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
-        }
-
-        // index along the column
-        // every column except fot the h_w first and last used by the north and south halos
-        if (i < jm-h_w && k < km && i > h_w-1) {
+        // index for the halo width
+        for (unsigned int w = 0; w < h_w; w++) {
             // index along the row
-            for (unsigned int w = 0; w < h_w; w++) {
-            // west halo
-            // i*im is the index for the column, w is the index along the row, k*im*jm is the index of the vertical plane
-            // km*im*h_w*2 is the size of the north+south halos, so the offset to go to the first element of the east halo
-            // i-h_w+w is the index in the halo buffer, since we skip the h_w first rows in the data array and they are not present in the halo buffer, we account for this by removing h_w
-            // k*(jm-2*h_w)*h_w is the offset for the index of the vertical plane
-            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
-            // east halo
-            // im-h_w+w are the last w indexes of the row
-            // km*im*h_w*2 + km*(jm-2*h_w)*h_w is the size of the north/south plus west halos, so the offset to go to the first element of the east halo
-            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+            // im is one row, times the width of the halo
+            if (i < im && k < km){
+                // north halo
+                // i is the index to copy in the row, k*im*jm is the index of the vertical plane
+                // v*v_sz is the vector offset for v_dim, i the index of the row, k*im*h_w the offset for the index of the next plane
+                ((__global float*)&array[i + im*w + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
+                // south halo
+                // im*(jm-h_w) is the offset to go to the last h_w rows of the plane
+                // km*im*h_w is the size of the north halo, so the offset to go to the first element of the south halo
+                ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
+            }
+
+            // index along the column
+            // every column except fot the h_w first and last used by the north and south halos
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                // west halo
+                // i*im is the index for the column, w is the index along the row, k*im*jm is the index of the vertical plane
+                // km*im*h_w*2 is the size of the north+south halos, so the offset to go to the first element of the east halo
+                // (i-h_w)*h_w+w is the index in the halo buffer, since we skip the h_w first rows in the data array and they are not present in the halo buffer, we account for this by removing h_w
+                // k*(jm-2*h_w)*h_w is the offset for the index of the vertical plane
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
+                // east halo
+                // im-h_w are the last w indexes of the row
+                // km*im*h_w*2 + km*(jm-2*h_w)*h_w is the size of the north/south plus west halos, so the offset to go to the first element of the east halo
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -65,20 +65,19 @@ void exchange_2_halo_write(
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
-         if (i < h_w*im && k < km){
-            // north halo
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
-            // south halo
-            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
-        }
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                // north halo
+                ((__global float*)&array[i + im*w + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
+                // south halo
+                ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
+            }
 
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            // index along the row
-            for (unsigned int w = 0; w < h_w; w++) {
-            // west halo
-            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
-            // east halo
-            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                // west halo
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
+                // east halo
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -100,20 +99,19 @@ void exchange_4_halo_write(
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
-         if (i < h_w*im && k < km){
-            // north halo
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
-            // south halo
-            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
-        }
+         for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                // north halo
+                ((__global float*)&array[i + im*w + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
+                // south halo
+                ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
+            }
 
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            // index along the row
-            for (unsigned int w = 0; w < h_w; w++) {
-            // west halo
-            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
-            // east halo
-            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                // west halo
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
+                // east halo
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -135,20 +133,19 @@ void exchange_16_halo_write(
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
-         if (i < h_w*im && k < km){
-            // north halo
-            ((__global float*)&array[i + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
-            // south halo
-            ((__global float*)&array[i + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
-        }
+         for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im && k < km){
+                // north halo
+                ((__global float*)&array[i + im*w + k*im*jm])[v] = buffer[v*v_sz + i + k*im*h_w];
+                // south halo
+                ((__global float*)&array[i + im*w + k*im*jm + im*(jm-h_w)])[v] = buffer[v*v_sz + km*im*h_w + i + k*im*h_w];
+            }
 
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            // index along the row
-            for (unsigned int w = 0; w < h_w; w++) {
-            // west halo
-            ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
-            // east halo
-            ((__global float*)&array[i*im + w + k*im*jm + im-h_w+w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                // west halo
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
+                // east halo
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -168,28 +165,23 @@ void exchange_1_halo_read(
     const unsigned int gl_id = get_global_id(0);
     const unsigned int k = gl_id % km;
     const unsigned int i = gl_id / km;
-    // h_w*h_w*km is the size of a corner, and there are 4 of them
-    const unsigned int v_sz = 2*km*im*h_w + 2*km*(jm-2*h_w)*h_w - 4*h_w*h_w*km;
+    const unsigned int v_sz = 2 * km * (im+jm-4*h_w)*h_w;
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < h_w*im && k < km){
-            if (i%im > h_w-1 && i%im < im-h_w) {
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im-h_w && k < km && i > h_w-1){
                 // north halo
-                // (h_w+(i/im)*2*h_w*(k+1)) is the offset for removing the 2 corners
-                buffer[v*v_sz + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[h_w*im + i + k*im*jm])[v];
+                buffer[v*v_sz + i-h_w + (im-2*h_w)*w + k*(im-2*h_w)*h_w] = ((__global float*)&array[im*h_w + i + im*w + k*im*jm])[v];
                 // south halo
-                // km*(im-h_w)*h_w is the new size of the north halo
-                buffer[v*v_sz + km*(im-h_w)*h_w + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[i - h_w*im + k*im*jm + im*(jm-h_w)])[v];
+                buffer[v*v_sz + km*(im-2*h_w)*h_w + i-h_w + (im-2*h_w)*w + k*(im-2*h_w)*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-2*h_w) + im*w])[v];
             }
-        }
-
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            // west halo
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
-            // east halo
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w - h_w + k*im*jm + im-h_w+w])[v];
+            
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                // west halo
+                buffer[v*v_sz + km*(im-2*h_w)*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
+                // east halo
+                buffer[v*v_sz + km*(im-2*h_w)*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-2*h_w])[v];
             }
         }
     }
@@ -211,21 +203,19 @@ void exchange_2_halo_read(
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < h_w*im && k < km){
-            if (i%im > h_w-1 && i%im < im-h_w) {
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im-h_w && k < km && i > h_w-1){
                 // north halo
-                buffer[v*v_sz + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[h_w*im + i + k*im*jm])[v];
+                buffer[v*v_sz + i-h_w + (im-2*h_w)*w + k*(im-2*h_w)*h_w] = ((__global float*)&array[im*h_w + i + im*w + k*im*jm])[v];
                 // south halo
-                buffer[v*v_sz + km*(im-h_w)*h_w + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[i - h_w*im + k*im*jm + im*(jm-h_w)])[v];
+                buffer[v*v_sz + km*(im-2*h_w)*h_w + i-h_w + (im-2*h_w)*w + k*(im-2*h_w)*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-2*h_w) + im*w])[v];
             }
-        }
-
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            // west halo
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
-            // east halo
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w - h_w + k*im*jm + im-h_w+w])[v];
+            
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                // west halo
+                buffer[v*v_sz + km*(im-2*h_w)*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
+                // east halo
+                buffer[v*v_sz + km*(im-2*h_w)*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-2*h_w])[v];
             }
         }
     }
@@ -247,21 +237,19 @@ void exchange_4_halo_read(
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < h_w*im && k < km){
-            if (i%im > h_w-1 && i%im < im-h_w) {
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im-h_w && k < km && i > h_w-1){
                 // north halo
-                buffer[v*v_sz + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[h_w*im + i + k*im*jm])[v];
+                buffer[v*v_sz + i-h_w + (im-2*h_w)*w + k*(im-2*h_w)*h_w] = ((__global float*)&array[im*h_w + i + im*w + k*im*jm])[v];
                 // south halo
-                buffer[v*v_sz + km*(im-h_w)*h_w + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[i - h_w*im + k*im*jm + im*(jm-h_w)])[v];
+                buffer[v*v_sz + km*(im-2*h_w)*h_w + i-h_w + (im-2*h_w)*w + k*(im-2*h_w)*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-2*h_w) + im*w])[v];
             }
-        }
-
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            // west halo
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
-            // east halo
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w - h_w + k*im*jm + im-h_w+w])[v];
+            
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                // west halo
+                buffer[v*v_sz + km*(im-2*h_w)*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
+                // east halo
+                buffer[v*v_sz + km*(im-2*h_w)*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-2*h_w])[v];
             }
         }
     }
@@ -284,22 +272,20 @@ void exchange_16_halo_read(
 
     // Which vector component, ie along v_dim
     for (unsigned int v = 0; v < v_dim; v++) {
-        if (i < h_w*im && k < km){
-            if (i%im > h_w-1 && i%im < im-h_w) {
+        for (unsigned int w = 0; w < h_w; w++) {
+            if (i < im-h_w && k < km && i > h_w-1){
                 // north halo
-                buffer[v*v_sz + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[h_w*im + i + k*im*jm])[v];
+                buffer[v*v_sz + i-h_w + (im-2*h_w)*w + k*(im-2*h_w)*h_w] = ((__global float*)&array[im*h_w + i + im*w + k*im*jm])[v];
                 // south halo
-                buffer[v*v_sz + km*(im-h_w)*h_w + i - (h_w+(i/im)*2*h_w*(k+1)) + k*im*h_w] = ((__global float*)&array[i - h_w*im + k*im*jm + im*(jm-h_w)])[v];
+                buffer[v*v_sz + km*(im-2*h_w)*h_w + i-h_w + (im-2*h_w)*w + k*(im-2*h_w)*h_w] = ((__global float*)&array[i + k*im*jm + im*(jm-2*h_w) + im*w])[v];
             }
-        }
-
-        if (i < jm-h_w && k < km && i > h_w-1) {
-            for (unsigned int w = 0; w < h_w; w++) {
-            // west halo
-            buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
-            // east halo
-            buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w - h_w + k*im*jm + im-h_w+w])[v];
+            
+            if (i < jm-h_w && k < km && i > h_w-1) {
+                // west halo
+                buffer[v*v_sz + km*(im-2*h_w)*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + h_w + k*im*jm])[v];
+                // east halo
+                buffer[v*v_sz + km*(im-2*h_w)*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-2*h_w])[v];
             }
-        }
+        }   
     }
 }

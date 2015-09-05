@@ -64,8 +64,8 @@ int main(void) {
     }
     
     const unsigned int h_w = 3;
-    const unsigned int im = 30;
-    const unsigned int jm = 40;
+    const unsigned int im = 20;
+    const unsigned int jm = 20;
     const unsigned int km = 2;
     const unsigned int v_dim = 2;
     const unsigned int arr_sz = v_dim * im * jm * km;

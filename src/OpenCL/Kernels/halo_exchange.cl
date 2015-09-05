@@ -37,13 +37,13 @@ void exchange_1_halo_write(
                 // west halo
                 // i*im is the index for the column, w is the index along the row, k*im*jm is the index of the vertical plane
                 // km*im*h_w*2 is the size of the north+south halos, so the offset to go to the first element of the east halo
-                // i-h_w+w is the index in the halo buffer, since we skip the h_w first rows in the data array and they are not present in the halo buffer, we account for this by removing h_w
+                // (i-h_w)*h_w+w is the index in the halo buffer, since we skip the h_w first rows in the data array and they are not present in the halo buffer, we account for this by removing h_w
                 // k*(jm-2*h_w)*h_w is the offset for the index of the vertical plane
-                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
                 // east halo
                 // im-h_w is the fist of the last h_w indexes of the row
                 // km*im*h_w*2 + km*(jm-2*h_w)*h_w is the size of the north/south plus west halos, so the offset to go to the first element of the east halo
-                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -75,9 +75,9 @@ void exchange_2_halo_write(
 
             if (i < jm-h_w && k < km && i > h_w-1) {
                 // west halo
-                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
                 // east halo
-                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -109,9 +109,9 @@ void exchange_4_halo_write(
 
             if (i < jm-h_w && k < km && i > h_w-1) {
                 // west halo
-                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
                 // east halo
-                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -143,9 +143,9 @@ void exchange_16_halo_write(
 
             if (i < jm-h_w && k < km && i > h_w-1) {
                 // west halo
-                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm])[v] = buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
                 // east halo
-                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w];
+                ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v] = buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w];
             }
         }
     }
@@ -179,9 +179,9 @@ void exchange_1_halo_read(
 
             if (i < jm-h_w && k < km && i > h_w-1) {
                 // west halo
-                buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
                 // east halo
-                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
+                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
             }
         }
     }
@@ -213,9 +213,9 @@ void exchange_2_halo_read(
 
             if (i < jm-h_w && k < km && i > h_w-1) {
                 // west halo
-                buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
                 // east halo
-                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
+                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
             }
         }
     }
@@ -247,9 +247,9 @@ void exchange_4_halo_read(
 
             if (i < jm-h_w && k < km && i > h_w-1) {
                 // west halo
-                buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
                 // east halo
-                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
+                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
             }
         }
     }
@@ -282,9 +282,9 @@ void exchange_16_halo_read(
 
             if (i < jm-h_w && k < km && i > h_w-1) {
                 // west halo
-                buffer[v*v_sz + km*im*h_w*2 + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
+                buffer[v*v_sz + km*im*h_w*2 + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm])[v];
                 // east halo
-                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + i-h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
+                buffer[v*v_sz + km*im*h_w*2 + km*(jm-2*h_w)*h_w + (i-h_w)*h_w+w + k*(jm-2*h_w)*h_w] = ((__global float*)&array[i*im + w + k*im*jm + im-h_w])[v];
             }
         }
     }
